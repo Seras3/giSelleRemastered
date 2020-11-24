@@ -1,0 +1,40 @@
+﻿@using giSelleRemastered.Models
+
+@{
+    ViewBag.Title = "Products list";
+}
+
+@model List<Product>
+
+<h2>Products list</h2>
+
+<p class="text-info">@ViewBag.Message</p>
+
+<br />
+<div>
+    @foreach (Product product in Model)
+    {
+        <h3>@product.Name</h3>
+        <Strong>Categories :</Strong>
+        foreach (var category in product.Categories)
+        {
+            <a href="/Category/Show/@category.Id">@category.Name |</a>
+        }
+        <br /> 
+        <strong>Price : <span class="text-success">@product.PriceInMu @product.Currency</span></strong>
+        <br />
+        if (product.HasQuantity)
+        {
+            <strong class="text-info">In stock : @product.Quantity </strong>
+        }
+        <br />
+        <br />
+        <a class="btn btn-info" href="/Product/Show/@product.Id">Show</a>
+        <a class="btn btn-primary" href="/Product/Edit/@product.Id">Edit</a>
+        <hr />
+    }
+</div>
+
+<br />
+<a class="btn btn-success" href="/Product/New">Add product</a>
+

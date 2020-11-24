@@ -13,7 +13,7 @@
 
     @Html.Label("Name", "Name")
     <br />
-    @Html.TextBox("Name", Model.Name, new { @class = "form-control" })
+    @Html.Editor("Name", new { @class = "form-control" })
     <br />
     <button type="submit" class="btn btn-success">Save</button>
 </form>

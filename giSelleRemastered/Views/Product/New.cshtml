@@ -1,0 +1,39 @@
+﻿
+@{
+    ViewBag.Title = "New";
+}
+
+<h2>New product</h2>
+
+<br />
+<form method="post" action="/Product/New">
+    @Html.Label("Name", "Name")
+    <br />
+    @Html.TextBox("Name", null, new { @class = "form-control" })
+    <br />
+    @Html.Label("Description", "Description")
+    <br />
+    @Html.TextArea("Description", null, new { @class = "form-control" })
+    <br />
+    @Html.Label("HasQuantity", "Has quantity")
+    <br />
+    @Html.CheckBox("HasQuantity", false, new { @class = "form-check-input" })
+    <br />
+    @Html.Label("Quantity", "Quantity")
+    <br />
+    @Html.TextBox("Quantity", "0", new { @class = "form-control" })
+    <br />
+    @Html.Label("PriceInMu", "Price")
+    <br />
+    @Html.TextBox("PriceInMu", "0", new { @class = "form-control" })
+    <br />
+    @Html.Label("Currency", "Currency")
+    <br />
+    @Html.DropDownList("Currency", new SelectList(ViewBag.Currencies, "Value", "Text"), new { @class = "form-control" })
+    <br />
+    @Html.Label("Categories", "Categories")
+    <br />
+    @Html.ListBox("SelectedCategoryIds", new SelectList(ViewBag.Categories, "Value", "Text"), new { @class = "form-control" })
+    <br />
+    <button class="btn btn-success" type="submit">Add product</button>
+</form>

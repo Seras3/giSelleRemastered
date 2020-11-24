@@ -1,6 +1,6 @@
 ﻿
 @{ 
-    ViewBag.Title = "Category list";
+    ViewBag.Title = "Categories list";
 }
 
 
@@ -13,8 +13,8 @@
     @foreach (var category in ViewBag.Categories)
     {
         <h4>@category.Name</h4>
-        <a class="btn btn-info" href="/Category/Show/@category.Id">Show</a>
-        <a class="btn btn-primary" href="/Category/Edit/@category.Id">Edit</a>
+        <a class="btn btn-sm btn-info" href="/Category/Show/@category.Id">Show</a>
+        <a class="btn btn-sm btn-primary" href="/Category/Edit/@category.Id">Edit</a>
         <hr />
     }
 </div>

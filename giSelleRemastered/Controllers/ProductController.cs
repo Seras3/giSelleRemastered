@@ -1,6 +1,7 @@
 ﻿using giSelleRemastered.Models;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
@@ -19,32 +20,40 @@ namespace giSelleRemastered.Controllers
                 ViewBag.Message = TempData["Message"].ToString();
             }
 
-            var products = from product in db.Products
+            var products = (from product in db.Products.Include("Categories")
                              orderby product.Name
-                             select product;
-
-            ViewBag.Products = products;
-            return View();
+                             select product).ToList();
+            return View(products);
         }
 
         public ActionResult Show(int id)
         {
             Product product = db.Products.Find(id);
+            StateInitialisation(product);
             return View(product);
         }
 
         public ActionResult New()
         {
+            StateInitialisation();
             return View();
         }
 
         [HttpPost]
         public ActionResult New(Product product)
         {
+            StateInitialisation();
             try
             {
                 if (ModelState.IsValid)
                 {
+                    product.Categories = new Collection<Category>();
+                    foreach(var selectedCategoryId in product.SelectedCategoryIds)
+                    {
+                        Category category = db.Categories.Find(selectedCategoryId);
+                        product.Categories.Add(category);
+                    }
+
                     db.Products.Add(product);
                     db.SaveChanges();
                     TempData["Message"] = "Product has been successfully added";
@@ -63,15 +72,17 @@ namespace giSelleRemastered.Controllers
         public ActionResult Edit(int id)
         {
             Product product = db.Products.Find(id);
+            StateInitialisation(product);
             return View(product);
         }
 
         [HttpPut]
         public ActionResult Edit(int id, Product requestProduct)
         {
+            Product product = db.Products.Find(id);
+            StateInitialisation(product);
             try
             {
-                Product product = db.Products.Find(id);
                 if (TryUpdateModel(product))
                 {
                     product.Name = requestProduct.Name;
@@ -80,6 +91,13 @@ namespace giSelleRemastered.Controllers
                     product.HasQuantity = requestProduct.HasQuantity;
                     product.Quantity = requestProduct.Quantity;
                     product.PriceInMu = requestProduct.PriceInMu;
+
+                    product.Categories = new Collection<Category>();
+                    foreach (var selectedCategoryId in requestProduct.SelectedCategoryIds)
+                    {
+                        Category category = db.Categories.Find(selectedCategoryId);
+                        product.Categories.Add(category);
+                    }
 
                     db.SaveChanges();
                     TempData["Message"] = "Product has been successfully changed";
@@ -105,6 +123,62 @@ namespace giSelleRemastered.Controllers
             TempData["Message"] = "Product has been removed";
             db.SaveChanges();
             return RedirectToAction("Index");
+        }
+
+        [NonAction]
+        public IEnumerable<SelectListItem> GetAllCurrencies()
+        {
+            var selectList = new List<SelectListItem>();
+            var currencies = new string[] {"RON", "EUR", "USD" };
+            foreach(var currency in currencies)
+            {
+                selectList.Add(new SelectListItem
+                {
+                    Text = currency,
+                    Value = currency
+                });
+            }
+            return selectList;
+        }
+
+        [NonAction]
+        public IEnumerable<SelectListItem> GetAllCategories()
+        {
+            var selectList = new List<SelectListItem>();
+            var categories = from category in db.Categories
+                             select category;
+            foreach(var category in categories)
+            {
+                selectList.Add(new SelectListItem
+                {
+                    Text = category.Name,
+                    Value = category.Id.ToString()
+                });
+            }
+            return selectList;
+        }
+
+        [NonAction]
+        public int[] GetSelectedCategories(Product product)
+        {
+            var categories = new List<int>();
+            foreach(var category in product.Categories)
+            {
+                categories.Add(category.Id);
+            }
+            return categories.ToArray();
+        }
+
+        public void StateInitialisation(Product product)
+        {
+            StateInitialisation();
+            product.SelectedCategoryIds = GetSelectedCategories(product);
+        }
+
+        public void StateInitialisation()
+        {
+            ViewBag.Categories = GetAllCategories();
+            ViewBag.Currencies = GetAllCurrencies();
         }
     }
 }

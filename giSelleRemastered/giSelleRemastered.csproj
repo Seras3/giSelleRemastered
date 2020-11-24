@@ -261,6 +261,10 @@
     <Content Include="Views\Category\Edit.cshtml" />
     <Content Include="Views\Category\New.cshtml" />
     <Content Include="Views\Home\Links.cshtml" />
+    <Content Include="Views\Product\Index.cshtml" />
+    <Content Include="Views\Product\New.cshtml" />
+    <Content Include="Views\Product\Edit.cshtml" />
+    <Content Include="Views\Product\Show.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Migrations\202011231723055_Initial.resx">
@@ -286,7 +290,6 @@
     <Folder Include="Content\Images\" />
     <Folder Include="Views\Cart\" />
     <Folder Include="Views\Comment\" />
-    <Folder Include="Views\Product\" />
     <Folder Include="Views\Rating\" />
   </ItemGroup>
   <PropertyGroup>
