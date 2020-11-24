@@ -10,11 +10,28 @@ namespace giSelleRemastered.Models
     {
         [Key]
         public int Id { get; set; }
+
+        [Required(ErrorMessage = "Name is mandatory.")]
+        [StringLength(256, ErrorMessage = "Name is too long.")]
         public string Name { get; set; }
+
+        [StringLength(64000, ErrorMessage = "Description is too long.")]
+        [DataType(DataType.MultilineText)]
         public string Description { get; set; }
+
+        [Required]
         public bool HasQuantity { get; set; }
+
+        [Range(0, int.MaxValue, ErrorMessage = "Quantity must be positive.")]
         public int Quantity { get; set; }
+
+        [Required(ErrorMessage = "Price is mandatory.")]
+        [RegularExpression(@"^\d*\.?\d*$", ErrorMessage = "Price must be a decimal number.")]
         public float PriceInMu { get; set; }
+
+        [Required(ErrorMessage = "Currency is mandatory.")]
+        [RegularExpression(@"^RON|EUR|USD$", ErrorMessage = "Unkown currency.")]
+        [StringLength(5, ErrorMessage = "Currency name is too long.")]
         public string Currency { get; set; }
         
         // public string Image { get; set; }
@@ -24,7 +41,8 @@ namespace giSelleRemastered.Models
         public virtual ICollection<Comment> Comments { get; set; }
         public virtual ICollection<Rating> Ratings { get; set; }
 
-        public int[] CategoryIds { get; set; }
+        [Required(ErrorMessage = "At least one category is mandatory.")]
+        public int[] SelectedCategoryIds { get; set; }
 
     }
 }

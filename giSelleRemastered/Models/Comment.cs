@@ -11,7 +11,11 @@ namespace giSelleRemastered.Models
         [Key]
         public int Id { get; set; }
         public int UserId { get; set; }
-        public int Content { get; set; }
+
+        [Required(ErrorMessage = "Content is mandatory.")]
+        [StringLength(256, ErrorMessage = "Too many characters.")]
+        [DataType(DataType.MultilineText)]
+        public string Content { get; set; }
         public DateTime Date { get; set; }
 
         public virtual ApplicationUser User { get; set; }
