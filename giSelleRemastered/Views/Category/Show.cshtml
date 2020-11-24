@@ -1,0 +1,23 @@
+﻿
+@{
+    ViewBag.Title = "Show";
+}
+
+@model giSelleRemastered.Models.Category
+
+
+<h2>Category </h2>
+<br />
+
+<h3>@Model.Name</h3>
+
+<form method="post" action="/Category/Delete/@Model.Id">
+    @Html.HttpMethodOverride(HttpVerbs.Delete)
+    <button type="submit" class="btn btn-danger">Delete</button>
+</form>
+
+<br />
+<a href="~/Category/Index" class="btn btn-primary">Back to list</a>
+
+
+

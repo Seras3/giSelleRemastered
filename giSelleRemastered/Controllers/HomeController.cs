@@ -15,15 +15,20 @@ namespace giSelleRemastered.Controllers
 
         public ActionResult About()
         {
-            ViewBag.Message = "Your application description page.";
+            ViewBag.Message = "Let's just talk about tattoos";
 
             return View();
         }
 
         public ActionResult Contact()
         {
-            ViewBag.Message = "Your contact page.";
+            ViewBag.Message = "Here you can find us";
 
+            return View();
+        }
+
+        public ActionResult Links()
+        {
             return View();
         }
     }

@@ -1,0 +1,19 @@
+﻿
+@{
+    ViewBag.Title = "Edit";
+}
+
+@model giSelleRemastered.Models.Category
+
+<h2>Edit</h2>
+<br />
+
+<form method="post" action="/Category/Edit/@Model.Id">
+    @Html.HttpMethodOverride(HttpVerbs.Put)
+
+    @Html.Label("Name", "Name")
+    <br />
+    @Html.TextBox("Name", Model.Name, new { @class = "form-control" })
+    <br />
+    <button type="submit" class="btn btn-success">Save</button>
+</form>

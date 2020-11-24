@@ -1,0 +1,24 @@
+﻿
+@{ 
+    ViewBag.Title = "Category list";
+}
+
+
+<h2>Category list</h2>
+
+<p class="text-info">@ViewBag.Message</p>
+
+<br />
+<div>
+    @foreach (var category in ViewBag.Categories)
+    {
+        <h4>@category.Name</h4>
+        <a class="btn btn-info" href="/Category/Show/@category.Id">Show</a>
+        <a class="btn btn-primary" href="/Category/Edit/@category.Id">Edit</a>
+        <hr />
+    }
+</div>
+
+<br /> 
+<a class="btn btn-success" href="/Category/New">Add category</a>
+
