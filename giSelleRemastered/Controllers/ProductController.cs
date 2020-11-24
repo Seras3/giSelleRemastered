@@ -75,6 +75,12 @@ namespace giSelleRemastered.Controllers
                 if (TryUpdateModel(product))
                 {
                     product.Name = requestProduct.Name;
+                    product.Description = requestProduct.Description;
+                    product.Currency = requestProduct.Currency;
+                    product.HasQuantity = requestProduct.HasQuantity;
+                    product.Quantity = requestProduct.Quantity;
+                    product.PriceInMu = requestProduct.PriceInMu;
+
                     db.SaveChanges();
                     TempData["Message"] = "Product has been successfully changed";
                     return RedirectToAction("Index");
