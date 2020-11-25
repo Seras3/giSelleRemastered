@@ -10,10 +10,12 @@
     @Html.Label("Name", "Name")
     <br />
     @Html.TextBox("Name", null, new { @class = "form-control" })
+    @Html.ValidationMessage("Name", null, new { @class = "text-danger" })
     <br />
     @Html.Label("Description", "Description")
     <br />
     @Html.TextArea("Description", null, new { @class = "form-control" })
+    @Html.ValidationMessage("Description", null, new { @class = "text-danger" })
     <br />
     @Html.Label("HasQuantity", "Has quantity")
     <br />
@@ -22,18 +24,22 @@
     @Html.Label("Quantity", "Quantity")
     <br />
     @Html.TextBox("Quantity", "0", new { @class = "form-control" })
+    @Html.ValidationMessage("Quantity", null, new { @class = "text-danger" })
     <br />
     @Html.Label("PriceInMu", "Price")
     <br />
     @Html.TextBox("PriceInMu", "0", new { @class = "form-control" })
+    @Html.ValidationMessage("PriceInMu", null, new { @class = "text-danger" })
     <br />
     @Html.Label("Currency", "Currency")
     <br />
     @Html.DropDownList("Currency", new SelectList(ViewBag.Currencies, "Value", "Text"), new { @class = "form-control" })
+    @Html.ValidationMessage("Currency", null, new { @class = "text-danger" })
     <br />
     @Html.Label("Categories", "Categories")
     <br />
     @Html.ListBox("SelectedCategoryIds", new SelectList(ViewBag.Categories, "Value", "Text"), new { @class = "form-control" })
+    @Html.ValidationMessage("SelectedCategoryIds", null, new { @class = "text-danger" })
     <br />
     <button class="btn btn-success" type="submit">Add product</button>
 </form>

@@ -15,6 +15,7 @@ namespace giSelleRemastered.Models
         [StringLength(256, ErrorMessage = "Name is too long.")]
         public string Name { get; set; }
 
+        [Required(ErrorMessage = "Description is mandatory.")]
         [StringLength(64000, ErrorMessage = "Description is too long.")]
         [DataType(DataType.MultilineText)]
         public string Description { get; set; }
@@ -26,7 +27,7 @@ namespace giSelleRemastered.Models
         public int Quantity { get; set; }
 
         [Required(ErrorMessage = "Price is mandatory.")]
-        [RegularExpression(@"^\d*\.?\d*$", ErrorMessage = "Price must be a decimal number.")]
+        [RegularExpression(@"^\d*\.?\d*$", ErrorMessage = "Price must be a decimal positive number.")]
         public float PriceInMu { get; set; }
 
         [Required(ErrorMessage = "Currency is mandatory.")]

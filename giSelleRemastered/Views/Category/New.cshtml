@@ -9,7 +9,8 @@
 <form method="post" action="/Category/New">
     @Html.Label("Name", "Name")
     <br />
-    @Html.TextBox("Name", null, new { @class = "form-control"})
+    @Html.TextBox("Name", null, new { @class = "form-control" })
+    @Html.ValidationMessage("Name", null, new { @class = "text-danger" })
     <br />
     <button class="btn btn-success" type="submit">Add category</button>
 </form>
