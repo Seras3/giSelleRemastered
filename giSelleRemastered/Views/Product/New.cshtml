@@ -5,8 +5,10 @@
 
 <h2>New product</h2>
 
+<p class="text-danger">@ViewBag.Message</p>
+
 <br />
-<form method="post" action="/Product/New">
+<form method="post" action="/Product/New" enctype="multipart/form-data">
     @Html.Label("Name", "Name")
     <br />
     @Html.TextBox("Name", null, new { @class = "form-control" })
@@ -40,6 +42,9 @@
     <br />
     @Html.ListBox("SelectedCategoryIds", new SelectList(ViewBag.Categories, "Value", "Text"), new { @class = "form-control" })
     @Html.ValidationMessage("SelectedCategoryIds", null, new { @class = "text-danger" })
+    <br />
+    @Html.Label("Image", "Product image")
+    @Html.TextBox("Image", null , new { type = "file", name = "Image" })
     <br />
     <button class="btn btn-success" type="submit">Add product</button>
 </form>

@@ -42,6 +42,7 @@ namespace giSelleRemastered.Models
         public DbSet<Cart> Carts { get; set; }
         public DbSet<Invoice> Invoices { get; set; }
         public DbSet<InvoiceLine> InvoiceLines { get; set; }
+        public DbSet<UploadFile> UploadFiles { get; set; }
 
         public static ApplicationDbContext Create()
         {

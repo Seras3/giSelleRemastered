@@ -2,9 +2,11 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using System.Data.Entity;
 
 namespace giSelleRemastered.Controllers
 {
@@ -28,25 +30,43 @@ namespace giSelleRemastered.Controllers
 
         public ActionResult Show(int id)
         {
-            Product product = db.Products.Find(id);
+            var product = db.Products.Include(i => i.Image).Where(p => p.Id == id).FirstOrDefault();
             StateInitialisation(product);
+            System.Diagnostics.Debug.WriteLine(product.Image.Path);
             return View(product);
         }
 
         public ActionResult New()
         {
+            if (TempData.ContainsKey("Message"))
+            {
+                ViewBag.Message = TempData["Message"].ToString();
+            }
             StateInitialisation();
             return View();
         }
 
         [HttpPost]
-        public ActionResult New(Product product)
+        public ActionResult New([Bind(Exclude = "ImageId,Image")]Product product, HttpPostedFileBase Image)
         {
             StateInitialisation();
+            int imageId = ValidateAddImage(Image);
+            if (imageId != 0)
+            {
+                System.Diagnostics.Debug.WriteLine(Image.FileName);
+            }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine("DEFAULT");
+            }
+
+            product.ImageId = imageId;
+
             try
             {
                 if (ModelState.IsValid)
                 {
+                    System.Diagnostics.Debug.WriteLine("VALID");
                     product.Categories = new Collection<Category>();
                     foreach(var selectedCategoryId in product.SelectedCategoryIds)
                     {
@@ -60,11 +80,13 @@ namespace giSelleRemastered.Controllers
                     return RedirectToAction("Index");
                 }
                 TempData["Message"] = "Product adding has been failed";
+                System.Diagnostics.Debug.WriteLine("INVALID");
                 return View(product);
             }
             catch (Exception e)
             {
                 TempData["Message"] = "Product adding has been failed";
+                System.Diagnostics.Debug.WriteLine("Eroare");
                 return View(product);
             }
         }
@@ -179,6 +201,44 @@ namespace giSelleRemastered.Controllers
         {
             ViewBag.Categories = GetAllCategories();
             ViewBag.Currencies = GetAllCurrencies();
+        }
+
+
+        public int ValidateAddImage(HttpPostedFileBase image)
+        {
+            if (image != null && image.ContentLength > 0)
+            {
+                UploadFile dbImage = new UploadFile();
+                try
+                {
+                    string path = Path.Combine(Server.MapPath("~/Content/Images/Products"),
+                                               Path.GetFileName(image.FileName));
+                    dbImage.Path = path;
+                    // Add extension constraints
+                    dbImage.Extension = Path.GetExtension(image.FileName);
+                    dbImage.Name = Path.GetFileNameWithoutExtension(image.FileName);
+                    dbImage.FileId = GetFileIdToAdd();
+                    image.SaveAs(path);
+                    db.UploadFiles.Add(dbImage);
+                    db.SaveChanges();
+                    ViewBag.Message = "File uploaded successfully";
+                }
+                catch (Exception ex)
+                {
+                    ViewBag.Message = "ERROR:" + ex.Message.ToString();
+                    return 0;
+                }
+                return dbImage.FileId;
+            }
+            else
+                return 0;
+        }
+
+        public int GetFileIdToAdd()
+        {
+            int maxId = (from elem in db.UploadFiles
+                        select elem.FileId).ToArray().Max();
+            return maxId + 1;
         }
     }
 }
