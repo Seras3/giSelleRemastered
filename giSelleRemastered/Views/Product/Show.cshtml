@@ -5,36 +5,46 @@
 
 @model giSelleRemastered.Models.Product
 
-
-<h2>Product </h2>
 <br />
-
-<h3>@Model.Name</h3>
-<div class="img-responsive img-thumbnail " style="width: 400px; height: 300px;">
-    <img src="@Url.Content(Model.Image.Path.Replace(Request.ServerVariables["APPL_PHYSICAL_PATH"], "~/"))" alt="@Model.Name" width="100%" height="100%"/>
+<div class="panel panel-default">
+    <div class="panel-body">
+        <h3>@Model.Name</h3>
+        <img src="@Url.Content(Model.Image.Path.Replace(Request.ServerVariables["APPL_PHYSICAL_PATH"], "~/"))" alt="@Model.Name" class="img-responsive pull-right panel-image" />
+        <br />
+        <br />
+        <p class="card-text">@Model.Description</p>
+        <Strong>Categories :</Strong>
+        @foreach (var category in Model.Categories)
+        {
+            <a href="/Category/Show/@category.Id">@category.Name |</a>
+        }
+        <br />
+        <strong>Price : <span class="text-success">@Model.PriceInMu @Model.Currency</span></strong>
+        <br />
+        @if (Model.HasQuantity)
+        {
+            <strong class="text-info">In stock : @Model.Quantity </strong>
+        }
+        <br />
+        Artist : <strong>@Model.User.UserName</strong>
+        <br />
+        <br />
+    </div>
+    @if (ViewBag.ShowButtons)
+    {
+        <div class="panel-footer">
+            <form method="post" action="/Product/Delete/@Model.Id">
+                @Html.HttpMethodOverride(HttpVerbs.Delete)
+                @if (ViewBag.ShowButtons)
+                {
+                    <a class="btn btn-primary pull-left" href="/Product/Edit/@Model.Id">Edit</a>
+                }
+                <button type="submit" class="btn btn-danger pull-right">Delete</button>
+            </form>
+            <div class="clearfix" ></div>
+        </div>
+    }
 </div>
-<br />
-<br />
-<p>@Model.Description</p>
-<Strong>Categories :</Strong>
-@foreach (var category in Model.Categories)
-{
-    <a href="/Category/Show/@category.Id">@category.Name |</a>
-}
-<br />
-<strong>Price : <span class="text-success">@Model.PriceInMu @Model.Currency</span></strong>
-<br />
-@if (Model.HasQuantity)
-{
-    <strong class="text-info">In stock : @Model.Quantity </strong>
-}
-<br />
-<br />
-
-<form method="post" action="/Product/Delete/@Model.Id">
-    @Html.HttpMethodOverride(HttpVerbs.Delete)
-    <button type="submit" class="btn btn-danger">Delete</button>
-</form>
 
 <br />
 <a href="~/Product/Index" class="btn btn-primary">Back to list</a>

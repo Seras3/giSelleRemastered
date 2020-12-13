@@ -7,7 +7,10 @@
 
 <ul>
     <li>@Html.ActionLink("Products","Index","Product")</li>
-    <li>@Html.ActionLink("Categories", "Index", "Category")</li>
+    @if (ViewBag.IsAdmin)
+    {
+        <li>@Html.ActionLink("Categories", "Index", "Category")</li>
+    }
     <!--<li>Html.ActionLink("Reviews","","")</li> -->
 </ul>
 

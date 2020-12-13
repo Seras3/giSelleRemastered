@@ -7,6 +7,8 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using System.Data.Entity;
+using Microsoft.AspNet.Identity;
+using Microsoft.AspNet.Identity.EntityFramework;
 
 namespace giSelleRemastered.Controllers
 {
@@ -14,7 +16,6 @@ namespace giSelleRemastered.Controllers
     {
         ApplicationDbContext db = new ApplicationDbContext();
 
-        // GET: Product
         public ActionResult Index()
         {
             if (TempData.ContainsKey("Message"))
@@ -25,48 +26,48 @@ namespace giSelleRemastered.Controllers
             var products = (from product in db.Products.Include("Categories")
                              orderby product.Name
                              select product).ToList();
+            ViewBag.ShowButtons = false;
+            if (User.IsInRole("Admin") || User.IsInRole("Partner"))
+                ViewBag.ShowButtons = true;
             return View(products);
         }
 
         public ActionResult Show(int id)
         {
-            var product = db.Products.Include(i => i.Image).Where(p => p.Id == id).FirstOrDefault();
+            var product = db.Products.Include(i => i.Image).Include(i => i.User).Where(p => p.Id == id).FirstOrDefault();
             StateInitialisation(product);
+            ViewBag.ShowButtons = false;
+            if (User.IsInRole("Admin") || (User.IsInRole("Partner") && IsOwner(product.UserId)))
+                ViewBag.ShowButtons = true;
             System.Diagnostics.Debug.WriteLine(product.Image.Path);
             return View(product);
         }
 
+        [Authorize(Roles = "Admin,Partner")]
         public ActionResult New()
         {
             if (TempData.ContainsKey("Message"))
             {
                 ViewBag.Message = TempData["Message"].ToString();
             }
+            Product product = new Product();
             StateInitialisation();
-            return View();
+            return View(product);
         }
 
+        [Authorize(Roles = "Admin,Partner")]
         [HttpPost]
         public ActionResult New([Bind(Exclude = "ImageId,Image")]Product product, HttpPostedFileBase Image)
         {
             StateInitialisation();
+            System.Diagnostics.Debug.WriteLine(product.UserId);
             int imageId = ValidateAddImage(Image);
-            if (imageId != 0)
-            {
-                System.Diagnostics.Debug.WriteLine(Image.FileName);
-            }
-            else
-            {
-                System.Diagnostics.Debug.WriteLine("DEFAULT");
-            }
-
             product.ImageId = imageId;
-
+            product.UserId = User.Identity.GetUserId();
             try
             {
                 if (ModelState.IsValid)
                 {
-                    System.Diagnostics.Debug.WriteLine("VALID");
                     product.Categories = new Collection<Category>();
                     foreach(var selectedCategoryId in product.SelectedCategoryIds)
                     {
@@ -80,17 +81,16 @@ namespace giSelleRemastered.Controllers
                     return RedirectToAction("Index");
                 }
                 TempData["Message"] = "Product adding has been failed";
-                System.Diagnostics.Debug.WriteLine("INVALID");
                 return View(product);
             }
             catch (Exception e)
             {
                 TempData["Message"] = "Product adding has been failed";
-                System.Diagnostics.Debug.WriteLine("Eroare");
                 return View(product);
             }
         }
 
+        [Authorize(Roles = "Admin,Partner")]
         public ActionResult Edit(int id)
         {
             Product product = db.Products.Find(id);
@@ -98,53 +98,72 @@ namespace giSelleRemastered.Controllers
             return View(product);
         }
 
+        [Authorize(Roles = "Admin,Partner")]
         [HttpPut]
         public ActionResult Edit(int id, Product requestProduct)
         {
+           
             Product product = db.Products.Find(id);
-            StateInitialisation(product);
-            try
+            if (IsOwner(product.UserId) || User.IsInRole("Admin"))
             {
-                if (TryUpdateModel(product))
+                StateInitialisation(product);
+                try
                 {
-                    product.Name = requestProduct.Name;
-                    product.Description = requestProduct.Description;
-                    product.Currency = requestProduct.Currency;
-                    product.HasQuantity = requestProduct.HasQuantity;
-                    product.Quantity = requestProduct.Quantity;
-                    product.PriceInMu = requestProduct.PriceInMu;
-
-                    product.Categories = new Collection<Category>();
-                    foreach (var selectedCategoryId in requestProduct.SelectedCategoryIds)
+                    if (TryUpdateModel(product))
                     {
-                        Category category = db.Categories.Find(selectedCategoryId);
-                        product.Categories.Add(category);
+                        product.Name = requestProduct.Name;
+                        product.Description = requestProduct.Description;
+                        product.Currency = requestProduct.Currency;
+                        product.HasQuantity = requestProduct.HasQuantity;
+                        product.Quantity = requestProduct.Quantity;
+                        product.PriceInMu = requestProduct.PriceInMu;
+
+                        product.Categories = new Collection<Category>();
+                        foreach (var selectedCategoryId in requestProduct.SelectedCategoryIds)
+                        {
+                            Category category = db.Categories.Find(selectedCategoryId);
+                            product.Categories.Add(category);
+                        }
+
+                        db.SaveChanges();
+                        TempData["Message"] = "Product has been successfully changed";
+                        return RedirectToAction("Index");
                     }
 
-                    db.SaveChanges();
-                    TempData["Message"] = "Product has been successfully changed";
-                    return RedirectToAction("Index");
+                    TempData["Message"] = "Product editing has been failed";
+                    return View(requestProduct);
+
                 }
-
-                TempData["Message"] = "Product editing has been failed";
-                return View(requestProduct);
-
+                catch (Exception e)
+                {
+                    TempData["Message"] = "Product editing has been failed";
+                    return View(requestProduct);
+                }
             }
-            catch (Exception e)
+            else
             {
-                TempData["Message"] = "Product editing has been failed";
-                return View(requestProduct);
+                TempData["Message"] = "You don't have permission to change this product";
+                return RedirectToAction("Index");
             }
         }
 
+        [Authorize(Roles = "Admin,Partner")]
         [HttpDelete]
         public ActionResult Delete(int id)
         {
             Product product = db.Products.Find(id);
-            db.Products.Remove(product);
-            TempData["Message"] = "Product has been removed";
-            db.SaveChanges();
-            return RedirectToAction("Index");
+            if (IsOwner(product.UserId) || User.IsInRole("Admin"))
+            {
+                db.Products.Remove(product);
+                TempData["Message"] = "Product has been removed";
+                db.SaveChanges();
+                return RedirectToAction("Index");
+            }
+            else
+            {
+                TempData["Message"] = "You don't have permission to change this product";
+                return RedirectToAction("Index");
+            }
         }
 
         [NonAction]
@@ -239,6 +258,23 @@ namespace giSelleRemastered.Controllers
             int maxId = (from elem in db.UploadFiles
                         select elem.FileId).ToArray().Max();
             return maxId + 1;
+        }
+
+        public List<string> GetUserRoles()
+        {
+            var roleManager = new RoleManager<IdentityRole>(new RoleStore<IdentityRole>(new ApplicationDbContext()));
+            List<string> userRoles = new List<string>();
+            foreach (var role in roleManager.Roles)
+            {
+                if(User.IsInRole(role.Name))
+                    userRoles.Add(role.Name);
+            }
+            return userRoles;
+        }
+        
+        public bool IsOwner(string id)
+        {
+            return id == User.Identity.GetUserId();
         }
     }
 }

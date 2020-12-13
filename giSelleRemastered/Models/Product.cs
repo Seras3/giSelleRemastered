@@ -39,6 +39,10 @@ namespace giSelleRemastered.Models
         [ForeignKey("Image")]
         public int ImageId { get; set; }
 
+        public string UserId { get; set; }
+
+
+        public virtual ApplicationUser User { get; set; }
         public virtual UploadFile Image { get; set; }
         public virtual ICollection<Category> Categories { get; set; }
         public virtual ICollection<Cart> Carts { get; set; }

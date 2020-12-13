@@ -30,11 +30,12 @@
         <br />
         <br />
         <a class="btn btn-info" href="/Product/Show/@product.Id">Show</a>
-        <a class="btn btn-primary" href="/Product/Edit/@product.Id">Edit</a>
         <hr />
     }
 </div>
 
 <br />
-<a class="btn btn-success" href="/Product/New">Add product</a>
-
+@if (ViewBag.ShowButtons)
+{
+    <a class="btn btn-success" href="/Product/New">Add product</a>
+}

@@ -13,6 +13,7 @@
 
 <form method="post" action="/Category/Delete/@Model.Id">
     @Html.HttpMethodOverride(HttpVerbs.Delete)
+    <a class="btn btn-primary" href="/Category/Edit/@Model.Id">Edit</a>
     <button type="submit" class="btn btn-danger">Delete</button>
 </form>
 

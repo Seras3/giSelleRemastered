@@ -7,6 +7,7 @@ using System.Web.Mvc;
 
 namespace giSelleRemastered.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class CategoryController : Controller
     {
         ApplicationDbContext db = new ApplicationDbContext();
