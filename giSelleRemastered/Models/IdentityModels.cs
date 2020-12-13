@@ -32,7 +32,7 @@ namespace giSelleRemastered.Models
             : base("DefaultConnection", throwIfV1Schema: false)
         {
             Database.SetInitializer(new MigrateDatabaseToLatestVersion<ApplicationDbContext,
-            giSelleRemastered.Migrations.Configuration>("DefaultConnection"));
+            Migrations.Configuration>("DefaultConnection"));
         }
 
         public DbSet<Product> Products { get; set; }

@@ -8,7 +8,7 @@
     using System.Linq;
     using System.Web;
 
-    internal sealed class Configuration : DbMigrationsConfiguration<giSelleRemastered.Models.ApplicationDbContext>
+    internal sealed class Configuration : DbMigrationsConfiguration<ApplicationDbContext>
     {
         public Configuration()
         {
@@ -17,25 +17,26 @@
             ContextKey = "giSelleRemastered.ApplicationDbContext";
         }
 
-        protected override void Seed(giSelleRemastered.Models.ApplicationDbContext context)
+        protected override void Seed(ApplicationDbContext context)
         {
             //  This method will be called after migrating to the latest version.
 
             //  You can use the DbSet<T>.AddOrUpdate() helper extension method
             //  to avoid creating duplicate seed data.
-            
-            
-            UploadFile defaultProductImage = new UploadFile
-            {
-                FileId = 0,
-                Path = Path.Combine(HttpContext.Current.Server.MapPath("~/Content/Images/Products"), "default.jpg"),
-                Name = "default",
-                Extension = ".jpg"
-            };
 
-            context.UploadFiles.AddOrUpdate(defaultProductImage);
-            context.SaveChanges();
-            
+            if (context.UploadFiles.Find(0) == null)
+            {
+                UploadFile defaultProductImage = new UploadFile
+                {
+                    FileId = 0,
+                    Path = Path.Combine(HttpContext.Current.Server.MapPath("~/Content/Images/Products"), "default.jpg"),
+                    Name = "default",
+                    Extension = ".jpg"
+                };
+
+                context.UploadFiles.AddOrUpdate(defaultProductImage);
+                context.SaveChanges();
+            } 
         }
     }
 }
