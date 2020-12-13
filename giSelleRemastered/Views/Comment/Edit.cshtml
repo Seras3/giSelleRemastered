@@ -1,0 +1,20 @@
+﻿
+@{
+    ViewBag.Title = "Edit";
+}
+
+@model giSelleRemastered.Models.Comment
+
+<h2>Edit</h2>
+<br />
+
+<form method="post" action="/Comment/Edit/@Model.Id">
+    @Html.HttpMethodOverride(HttpVerbs.Put)
+
+    @Html.LabelFor(m => m.Content)
+    <br />
+    @Html.Editor("Content", new { htmlAttributes = new { @class = "form-control" } })
+    @Html.ValidationMessage("Content", null, new { @class = "text-danger" })
+    <br />
+    <button type="submit" class="btn btn-success">Save</button>
+</form>

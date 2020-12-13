@@ -34,13 +34,67 @@ namespace giSelleRemastered.Controllers
 
         public ActionResult Show(int id)
         {
-            var product = db.Products.Include(i => i.Image).Include(i => i.User).Where(p => p.Id == id).FirstOrDefault();
+            var product = db.Products.Include(i => i.Image)
+                                     .Include(i => i.User)
+                                     .Include(i => i.Comments)
+                                     .Where(p => p.Id == id).FirstOrDefault();
             StateInitialisation(product);
+            ViewBag.Comments = GetCommentsForProduct(product);
+            ViewBag.CurrentUser = User.Identity.GetUserId();
+
+            ViewBag.IsAdmin = false;
+            if (User.IsInRole("Admin"))
+                ViewBag.IsAdmin = true;
+
             ViewBag.ShowButtons = false;
             if (User.IsInRole("Admin") || (User.IsInRole("Partner") && IsOwner(product.UserId)))
                 ViewBag.ShowButtons = true;
-            System.Diagnostics.Debug.WriteLine(product.Image.Path);
+
+            ViewBag.ShowAddComment = false;
+            if (User.IsInRole("Admin") || User.IsInRole("Partner") || User.IsInRole("User") )
+                ViewBag.ShowAddComment= true;
+
             return View(product);
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "Admin,Partner,User")]
+        public ActionResult Show(Comment comment)
+        {
+            var product = db.Products.Include(i => i.Image)
+                                     .Include(i => i.User)
+                                     .Where(p => p.Id == comment.ProductId).FirstOrDefault();
+            StateInitialisation(product);
+            ViewBag.Comments = GetCommentsForProduct(product);
+            ViewBag.CurrentUser = User.Identity.GetUserId();
+            
+            ViewBag.IsAdmin = false;
+            if(User.IsInRole("Admin"))
+                ViewBag.IsAdmin = true;
+
+            ViewBag.ShowButtons = false;
+            if (User.IsInRole("Admin") || (User.IsInRole("Partner") && IsOwner(product.UserId)))
+                ViewBag.ShowButtons = true;
+            
+            ViewBag.ShowAddComment = false;
+            if (User.IsInRole("Admin") || User.IsInRole("Partner") || User.IsInRole("User"))
+                ViewBag.ShowAddComment = true;
+
+            comment.Date = DateTime.Now;
+            comment.UserId = User.Identity.GetUserId();
+
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    db.Comments.Add(comment);
+                    db.SaveChanges();
+                }
+                return Redirect("/Product/Show/" + comment.ProductId);
+            }
+            catch(Exception) {}
+            return View(product);
+
         }
 
         [Authorize(Roles = "Admin,Partner")]
@@ -60,7 +114,6 @@ namespace giSelleRemastered.Controllers
         public ActionResult New([Bind(Exclude = "ImageId,Image")]Product product, HttpPostedFileBase Image)
         {
             StateInitialisation();
-            System.Diagnostics.Debug.WriteLine(product.UserId);
             int imageId = ValidateAddImage(Image);
             product.ImageId = imageId;
             product.UserId = User.Identity.GetUserId();
@@ -182,6 +235,7 @@ namespace giSelleRemastered.Controllers
             return selectList;
         }
 
+
         [NonAction]
         public IEnumerable<SelectListItem> GetAllCategories()
         {
@@ -208,6 +262,16 @@ namespace giSelleRemastered.Controllers
                 categories.Add(category.Id);
             }
             return categories.ToArray();
+        }
+
+        [NonAction]
+        public List<Comment> GetCommentsForProduct(Product product)
+        {
+            List<Comment> comments = (from comm in db.Comments.Include("User")
+                                      where comm.ProductId == product.Id
+                                     orderby comm.Date descending
+                                     select comm).ToList();
+            return comments;
         }
 
         public void StateInitialisation(Product product)

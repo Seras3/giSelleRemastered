@@ -374,6 +374,7 @@
     <Content Include="Scripts\popper.js.map" />
     <Content Include="Scripts\popper-utils.min.js.map" />
     <Content Include="Scripts\popper-utils.js.map" />
+    <Content Include="Views\Comment\Edit.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Migrations\202011231723055_Initial.resx">
@@ -389,7 +390,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Views\Cart\" />
-    <Folder Include="Views\Comment\" />
     <Folder Include="Views\Rating\" />
   </ItemGroup>
   <ItemGroup>

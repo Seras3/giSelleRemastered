@@ -8,9 +8,8 @@
 <br />
 <div class="panel panel-default">
     <div class="panel-body">
+        <img src="@Url.Content(Model.Image.Path.Replace(Request.ServerVariables["APPL_PHYSICAL_PATH"], "~/"))" alt="@Model.Name" class="img-responsive pull-right" style="max-width:250px; max-height:250px" />
         <h3>@Model.Name</h3>
-        <img src="@Url.Content(Model.Image.Path.Replace(Request.ServerVariables["APPL_PHYSICAL_PATH"], "~/"))" alt="@Model.Name" class="img-responsive pull-right panel-image" />
-        <br />
         <br />
         <p class="card-text">@Model.Description</p>
         <Strong>Categories :</Strong>
@@ -26,8 +25,8 @@
             <strong class="text-info">In stock : @Model.Quantity </strong>
         }
         <br />
-        Artist : <strong>@Model.User.UserName</strong>
         <br />
+        Artist : <strong>@Model.User.UserName</strong>
         <br />
     </div>
     @if (ViewBag.ShowButtons)
@@ -41,10 +40,68 @@
                 }
                 <button type="submit" class="btn btn-danger pull-right">Delete</button>
             </form>
-            <div class="clearfix" ></div>
+            <div class="clearfix"></div>
         </div>
     }
 </div>
 
+
+@if (ViewBag.ShowAddComment)
+{
+<div class="row">
+    <div class="col-md-2"></div>
+    <div class="col-md-8">
+        <div class="panel">
+            <form method="post" action="/Product/Show/@Model.Id">
+                <div class="panel-body">
+                    <input type="hidden" name="ProductId" value="@Model.Id" />
+                    <label>Continut comentariu</label>
+                    <br />
+                    <textarea class="form-control" name="Content"></textarea>
+                    @Html.ValidationMessage("Content", "", new { @class = "text-danger" })
+                    <br />
+                    <button class="btn btn-success" type="submit">Adauga comentariu</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="col-md-2"></div>
+</div>
 <br />
-<a href="~/Product/Index" class="btn btn-primary">Back to list</a>
+}
+
+@foreach (var comm in ViewBag.Comments)
+{
+    <div class="container">
+        <div class="row">
+            <div class="col-md-2"></div>
+            <div class="col-md-8">
+                <div>
+                    <p>@comm.Content</p>
+                    <small class="pull-right">@comm.Date</small>
+                </div>
+                <div>
+                    By:<strong>@comm.User.UserName</strong>
+                </div>
+                <br />
+                @if (ViewBag.CurrentUser == comm.UserId)
+                {
+                <div style="display: inline-block; float : left; margin-right: 15px">
+                    <a class="glyphicon glyphicon-pencil" href="/Comment/Edit/@comm.Id"></a>
+                </div>
+                }
+                @if (ViewBag.CurrentUser == comm.UserId || ViewBag.IsAdmin)
+                { 
+                <div style="display: inline-block; float : left">
+                    <form method="post" action="/Comment/Delete/@comm.Id">
+                        @Html.HttpMethodOverride(HttpVerbs.Delete)
+                        <button class="glyphicon glyphicon-trash text-danger" style="border: none; background: transparent" type="submit"></button>
+                    </form>
+                </div>
+                }
+            </div>
+        </div>
+        <div class="col-md-2"></div>
+    </div>
+    <hr />
+}
