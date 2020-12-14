@@ -1,0 +1,20 @@
+﻿
+@{
+    ViewBag.Title = "UserIndex";
+}
+
+@model IList<giSelleRemastered.Models.UserRole>
+
+<h2>Users</h2>
+
+@foreach(var user in Model)
+{
+<div class="panel panel-info">
+    <p style="display:inline;">@user.User.UserName</p>
+    <form method="post" action="/Admin/UserEdit/@user.User.Id">
+        @Html.HttpMethodOverride(HttpVerbs.Put)
+        @Html.DropDownList("RoleName", new SelectList(user.Roles, "Value", "Text", user.Role.Name), new { @class = "form-control" })
+        <button type="submit" class="btn btn-sm btn-info">Save</button>
+    </form>
+</div>
+}

@@ -1,6 +1,6 @@
 ﻿
 @{
-    ViewBag.Title = "Edit";
+    ViewBag.Title = "CategoryEdit";
 }
 
 @model giSelleRemastered.Models.Category
@@ -8,13 +8,14 @@
 <h2>Edit</h2>
 <br />
 
-<form method="post" action="/Category/Edit/@Model.Id">
+<form method="post" action="/Admin/CategoryEdit/@Model.Id">
     @Html.HttpMethodOverride(HttpVerbs.Put)
 
     @Html.Label("Name", "Name")
     <br />
     @Html.Editor("Name", new { htmlAttributes = new { @class = "form-control" } })
-    @Html.ValidationMessage("Name", null, new { @class = "text-danger"})
+    @Html.ValidationMessage("Name", null, new { @class = "text-danger" })
     <br />
     <button type="submit" class="btn btn-success">Save</button>
 </form>
+

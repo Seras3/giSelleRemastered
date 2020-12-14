@@ -11,12 +11,14 @@
 
 <h3>@Model.Name</h3>
 
-<form method="post" action="/Category/Delete/@Model.Id">
+@if (ViewBag.IsAdmin)
+{
+<form method="post" action="/Admin/CategoryDelete/@Model.Id">
     @Html.HttpMethodOverride(HttpVerbs.Delete)
-    <a class="btn btn-primary" href="/Category/Edit/@Model.Id">Edit</a>
+    <a class="btn btn-primary" href="/Admin/CategoryEdit/@Model.Id">Edit</a>
     <button type="submit" class="btn btn-danger">Delete</button>
 </form>
-
+}
 <br />
 <a href="~/Category/Index" class="btn btn-primary">Back to list</a>
 

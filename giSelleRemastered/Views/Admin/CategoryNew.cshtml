@@ -1,12 +1,12 @@
 ﻿
 @{
-    ViewBag.Title = "New";
+    ViewBag.Title = "CategoryNew";
 }
 
 <h2>New category</h2>
 
 <br />
-<form method="post" action="/Category/New">
+<form method="post" action="/Admin/CategoryNew">
     @Html.Label("Name", "Name")
     <br />
     @Html.TextBox("Name", null, new { @class = "form-control" })

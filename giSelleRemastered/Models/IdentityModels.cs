@@ -43,6 +43,8 @@ namespace giSelleRemastered.Models
         public DbSet<Invoice> Invoices { get; set; }
         public DbSet<InvoiceLine> InvoiceLines { get; set; }
         public DbSet<UploadFile> UploadFiles { get; set; }
+        public DbSet<IdentityUserRole> UsersRoles { get; set; }
+
 
         public static ApplicationDbContext Create()
         {
