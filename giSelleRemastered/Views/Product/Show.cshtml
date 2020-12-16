@@ -33,12 +33,11 @@
             <form method="post" action="/Product/Show/@Model.Id">
                 <div class="panel-body">
                     <input type="hidden" name="ProductId" value="@Model.Id" />
-                    <label>Continut comentariu</label>
                     <br />
                     <textarea class="form-control" name="Content"></textarea>
                     @Html.ValidationMessage("Content", "", new { @class = "text-danger" })
                     <br />
-                    <button class="btn btn-success" type="submit">Adauga comentariu</button>
+                    <button class="btn btn-success" type="submit">Post comment</button>
                 </div>
             </form>
         </div>
@@ -61,13 +60,10 @@
                 <div>
                     By:<strong>@comm.User.UserName</strong>
                 </div>
-                <br />
-                <p>ViewBag : @ViewBag.CurrentUser </p>
-                <p>Current user: @comm.UserId</p>
                 @if (ViewBag.CurrentUser == comm.UserId)
                 {
                     <div style="display: inline-block; float : left; margin-right: 15px;">
-                        <a class="glyphicon glyphicon-pencil" href="/Comment/Edit/@comm.Id"></a>
+                        <a class="btn btn-sm btn-primary" href="/Comment/Edit/@comm.Id">Edit</a>
                     </div>
                 }
                 @if (ViewBag.CurrentUser == comm.UserId || ViewBag.IsAdmin)
@@ -75,13 +71,13 @@
                     <div style="display: inline-block; float : left;">
                         <form method="post" action="/Comment/Delete/@comm.Id">
                             @Html.HttpMethodOverride(HttpVerbs.Delete)
-                            <button class="glyphicon glyphicon-trash text-danger" style="border: none; background: transparent" type="submit"></button>
+                            <button class="btn btn-sm btn-danger" type="submit">Delete</button>
                         </form>
                     </div>
                 }
             </div>
+            <div class="col-md-2"></div>
         </div>
-        <div class="col-md-2"></div>
     </div>
     <hr />
 }

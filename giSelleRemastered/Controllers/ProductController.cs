@@ -44,9 +44,7 @@ namespace giSelleRemastered.Controllers
             
             ViewBag.Comments = GetCommentsForProduct(product);
             ViewBag.CurrentUser = User.Identity.GetUserId();
-            // AICI
-            Console.WriteLine(User.Identity.GetUserId());
-            /////////////////////////////////////////////
+
             ViewBag.IsAdmin = User.IsInRole("Admin");
             ViewBag.ShowButtons = User.IsInRole("Admin") || (User.IsInRole("Partner") && IsOwner(product.UserId));
             ViewBag.ShowAddComment = User.IsInRole("Admin") || User.IsInRole("Partner") || User.IsInRole("User");
@@ -60,6 +58,7 @@ namespace giSelleRemastered.Controllers
         {
             var product = db.Products.Include(i => i.Image)
                                      .Include(i => i.User)
+                                     .Include(i => i.Comments)
                                      .Where(p => p.Id == comment.ProductId).FirstOrDefault();
             StateInitialisation();
             ViewBag.Comments = GetCommentsForProduct(product);
@@ -71,7 +70,10 @@ namespace giSelleRemastered.Controllers
 
             comment.Date = DateTime.Now;
             comment.UserId = User.Identity.GetUserId();
-
+            
+            if (comment.Content == null)
+                return View(product);
+            
             try
             {
                 if (ModelState.IsValid)
