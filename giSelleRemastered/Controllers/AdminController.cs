@@ -1,4 +1,5 @@
-﻿using giSelleRemastered.Models;
+﻿using AutoMapper;
+using giSelleRemastered.Models;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using System;
@@ -12,8 +13,8 @@ namespace giSelleRemastered.Controllers
     [Authorize(Roles = "Admin")]
     public class AdminController : AccountController
     {
-        ApplicationDbContext db = new ApplicationDbContext();
-
+        private ApplicationDbContext db = new ApplicationDbContext();
+        private IMapper mapper = MapperContext.mapper;
         public ActionResult UserIndex()
         {
             var usersWithRoles = from userRole in db.UsersRoles
@@ -124,12 +125,7 @@ namespace giSelleRemastered.Controllers
             var requests = db.Products.Include("User")
                                       .Include("Image")
                                       .Include("Categories").ToList();
-            List<ProductView> prodViews = new List<ProductView>();
-            foreach(var req in requests)
-            {
-                prodViews.Add(ProductToView(req));
-            }
-            return View(prodViews);
+            return View(requests);
         }
 
         public ActionResult RequestShow(int id)
@@ -140,8 +136,8 @@ namespace giSelleRemastered.Controllers
                                      .Where(i => i.Id == id).FirstOrDefault();
             if (request.Accepted)
                 return RedirectToAction("RequestIndex");
-            
-            return View(ProductToView(request));
+            ProductView product = mapper.Map<Product,ProductView>(request);
+            return View(product);
         }
 
         [HttpPost]
@@ -150,7 +146,7 @@ namespace giSelleRemastered.Controllers
             Product product = db.Products.Find(id);
             if (requestedProduct.Accepted)
             {
-                if (TryUpdateModel(product,null, new string[] {"Accepted"}))
+                if (TryUpdateModel(product))
                 {
                     product.Accepted = true;
                     db.SaveChanges();
@@ -199,25 +195,6 @@ namespace giSelleRemastered.Controllers
                 });
             }
             return selectList;
-        }
-
-        public ProductView ProductToView(Product req)
-        {
-            ProductView pv = new ProductView
-            {
-                Id = req.Id,
-                Name = req.Name,
-                Description = req.Description,
-                HasQuantity = req.HasQuantity,
-                Quantity = req.Quantity,
-                PriceInMu = req.PriceInMu,
-                Currency = req.Currency,
-                Accepted = req.Accepted,
-                Image = req.Image,
-                User = req.User,
-                Categories = req.Categories
-            };
-            return pv;
         }
 
         [NonAction]

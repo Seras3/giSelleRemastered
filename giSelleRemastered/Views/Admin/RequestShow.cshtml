@@ -10,7 +10,7 @@
 <p class="text-info">@ViewBag.Message</p>
 
 <div class="card">
-    @Html.Partial("~/Views/Shared/Product/_RequestBody.cshtml", Model)
+    @Html.Partial("_ProductBody", Model)
     <div class="card-footer">
         <div class="btn-group">
             <form method="POST" action="/Admin/RequestResponse/@Model.Id">

@@ -9,12 +9,14 @@ using System.Web.Mvc;
 using System.Data.Entity;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
+using AutoMapper;
 
 namespace giSelleRemastered.Controllers
 {
     public class ProductController : Controller
     {
-        ApplicationDbContext db = new ApplicationDbContext();
+        private ApplicationDbContext db = new ApplicationDbContext();
+        private IMapper mapper = MapperContext.mapper;
 
         public ActionResult Index()
         {
@@ -22,14 +24,9 @@ namespace giSelleRemastered.Controllers
             {
                 ViewBag.Message = TempData["Message"].ToString();
             }
-
             var products = (from product in db.Products.Include("Categories")
                              orderby product.Name
                              select product).ToList();
-            foreach(var prod in products)
-            {
-                System.Diagnostics.Debug.WriteLine(prod.Name);
-            }
             ViewBag.ShowButtons = User.IsInRole("Admin") || User.IsInRole("Partner");
             return View(products);
         }
@@ -47,7 +44,9 @@ namespace giSelleRemastered.Controllers
             
             ViewBag.Comments = GetCommentsForProduct(product);
             ViewBag.CurrentUser = User.Identity.GetUserId();
-
+            // AICI
+            Console.WriteLine(User.Identity.GetUserId());
+            /////////////////////////////////////////////
             ViewBag.IsAdmin = User.IsInRole("Admin");
             ViewBag.ShowButtons = User.IsInRole("Admin") || (User.IsInRole("Partner") && IsOwner(product.UserId));
             ViewBag.ShowAddComment = User.IsInRole("Admin") || User.IsInRole("Partner") || User.IsInRole("User");
@@ -94,50 +93,51 @@ namespace giSelleRemastered.Controllers
             {
                 ViewBag.Message = TempData["Message"].ToString();
             }
-            Product product = new ProductWithCategories();
+            ProductWithCategories product = mapper.Map<Product, ProductWithCategories>(new Product());
             StateInitialisation();
-            return View((ProductWithCategories)product);
+            return View(product);
         }
 
         [Authorize(Roles = "Admin,Partner")]
         [HttpPost]
-        public ActionResult New([Bind(Exclude = "ImageId,Image,Accepted")]ProductWithCategories product, HttpPostedFileBase Image)
+        public ActionResult New([Bind(Exclude = "ImageId,Image,Accepted")]ProductWithCategories newProduct, HttpPostedFileBase Image)
         {
             StateInitialisation();
             int imageId = ValidateAddImage(Image);
-            product.ImageId = imageId;
-            product.UserId = User.Identity.GetUserId();
+            newProduct.ImageId = imageId;
+            newProduct.UserId = User.Identity.GetUserId();
             try
             {
                 if (ModelState.IsValid)
                 {
-                    product.Categories = new Collection<Category>();
-                    foreach(var selectedCategoryId in product.SelectedCategoryIds)
+                    newProduct.Categories = new List<Category>();
+                    foreach(var selectedCategoryId in newProduct.SelectedCategoryIds)
                     {
                         Category category = db.Categories.Find(selectedCategoryId);
-                        product.Categories.Add(category);
+                        newProduct.Categories.Add(category);
                     }
-                    db.Products.Add(product);
+                    Product dbProduct = mapper.Map<ProductWithCategories, Product>(newProduct);
+                    db.Products.Add(dbProduct);
                     db.SaveChanges();
                     TempData["Message"] = "Your request will be submited by admin";
                     return RedirectToAction("Index");
                 }
                 TempData["Message"] = "Product adding has been failed";
-                return View(product);
+                return View(newProduct);
             }
             catch (Exception)
             {
                 TempData["Message"] = "Product adding has been failed";
-                return View(product);
+                return View(newProduct);
             }
         }
 
         [Authorize(Roles = "Admin,Partner")]
         public ActionResult Edit(int id)
         {
-            Product product = (ProductWithCategories)db.Products.Find(id);
-            StateInitialisation((ProductWithCategories)product);
-            return View((ProductWithCategories)product);
+            ProductWithCategories product = mapper.Map<Product, ProductWithCategories>(db.Products.Find(id));
+            StateInitialisation(product);
+            return View(product);
         }
 
         [Authorize(Roles = "Admin,Partner")]
@@ -145,20 +145,15 @@ namespace giSelleRemastered.Controllers
         public ActionResult Edit(int id, ProductWithCategories requestProduct)
         {
            
-            Product product = (ProductWithCategories)db.Products.Find(id);
+            Product product = db.Products.Find(id);
             if (IsOwner(product.UserId) || User.IsInRole("Admin"))
             {
-                StateInitialisation((ProductWithCategories)product);
+                StateInitialisation();
                 try
                 {
                     if (TryUpdateModel(product))
                     {
-                        product.Name = requestProduct.Name;
-                        product.Description = requestProduct.Description;
-                        product.Currency = requestProduct.Currency;
-                        product.HasQuantity = requestProduct.HasQuantity;
-                        product.Quantity = requestProduct.Quantity;
-                        product.PriceInMu = requestProduct.PriceInMu;
+                        product = mapper.Map<ProductWithCategories, Product>(requestProduct);
 
                         product.Categories = new Collection<Category>();
                         foreach (var selectedCategoryId in requestProduct.SelectedCategoryIds)
@@ -243,7 +238,7 @@ namespace giSelleRemastered.Controllers
         }
 
         [NonAction]
-        public int[] GetSelectedCategories(Product product)
+        public int[] GetSelectedCategories(ProductWithCategories product)
         {
             var categories = new List<int>();
             foreach(var category in product.Categories)

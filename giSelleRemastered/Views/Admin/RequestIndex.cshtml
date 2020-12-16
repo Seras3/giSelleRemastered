@@ -3,7 +3,7 @@
     ViewBag.Title = "RequestIndex";
 }
 
-@model List<giSelleRemastered.Models.ProductView>
+@model List<giSelleRemastered.Models.Product>
 
 <h2>Requests list</h2>
 
@@ -14,20 +14,30 @@
     {
         if (!product.Accepted)
         {
-            <hr />
-            <h3>@product.Name</h3>
-            <img src="@Url.Content(product.Image.Path.Replace(Request.ServerVariables["APPL_PHYSICAL_PATH"], "~/"))" class="img-responsive pull-right" style="max-width:250px; max-height:250px" />
-            <strong>Price : <span class="text-success">@product.PriceInMu @product.Currency</span></strong>
-            <br />
-            if (product.HasQuantity)
-            {
-                <strong class="text-info">In stock : @product.Quantity </strong>
-            }
-            <br />
-            <p>By: <strong>@product.User.UserName</strong></p>
-
-            <a class="btn btn-info" href="/Admin/RequestShow/@product.Id">Show</a>
-            <br />
+            <div class="card">
+                <div class="card-body">
+                    <img src="@Url.Content(product.Image.Path.Replace(Request.ServerVariables["APPL_PHYSICAL_PATH"], "~/"))" class="img-thumbnail float-right" style="max-width:250px; max-height:250px" />
+                    <h3>@product.Name</h3>
+                    <br />
+                    <Strong>Categories :</Strong>
+                    @foreach (var category in product.Categories)
+                    {
+                        <a href="/Category/Show/@category.Id">@category.Name |</a>
+                    }
+                    <br />
+                    <strong>Price : <span class="text-success">@product.PriceInMu @product.Currency</span></strong>
+                    <br />
+                    @if (product.HasQuantity)
+                    {
+                        <strong class="text-info">In stock : @product.Quantity </strong>
+                        <br />
+                    }
+                    <p>Artist: <strong>@product.User.UserName</strong></p>
+                </div>
+                <div class="card-footer">
+                    <a class="btn btn-info" href="/Admin/RequestShow/@product.Id">Show</a>
+                </div>
+            </div>
         }
     }
 </div>

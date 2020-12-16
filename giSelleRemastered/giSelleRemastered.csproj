@@ -48,6 +48,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="AutoMapper, Version=10.0.0.0, Culture=neutral, PublicKeyToken=be96cd2c38ef1005, processorArchitecture=MSIL">
+      <HintPath>..\packages\AutoMapper.10.1.1\lib\net461\AutoMapper.dll</HintPath>
+    </Reference>
     <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <HintPath>..\packages\EntityFramework.6.4.4\lib\net45\EntityFramework.dll</HintPath>
     </Reference>
@@ -194,6 +197,7 @@
     <Compile Include="Models\Invoice.cs" />
     <Compile Include="Models\InvoiceLine.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
+    <Compile Include="Models\MapperContext.cs" />
     <Compile Include="Models\Product.cs" />
     <Compile Include="Models\Rating.cs" />
     <Compile Include="Models\UploadFile.cs" />
@@ -433,9 +437,7 @@
     <Content Include="Views\Admin\RequestIndex.cshtml" />
     <Content Include="Views\Shared\_NavBar.cshtml" />
     <Content Include="Views\Shared\_Footer.cshtml" />
-    <Content Include="Views\Shared\Product\_PostBody.cshtml" />
     <Content Include="Views\Admin\RequestShow.cshtml" />
-    <Content Include="Views\Shared\Product\_RequestBody.cshtml" />
     <Content Include="Views\Shared\_ProductBody.cshtml" />
   </ItemGroup>
   <ItemGroup>

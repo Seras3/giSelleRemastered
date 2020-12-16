@@ -3,16 +3,11 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Web;
 
 namespace giSelleRemastered.Models
 {
-    public class Product
+    public class ProductAttributes
     {
-        [Key]
-        public int Id { get; set; }
-
         [Required(ErrorMessage = "Name is mandatory.")]
         [StringLength(256, ErrorMessage = "Name is too long.")]
         public string Name { get; set; }
@@ -36,7 +31,7 @@ namespace giSelleRemastered.Models
         [RegularExpression(@"^RON|EUR|USD$", ErrorMessage = "Unkown currency.")]
         [StringLength(5, ErrorMessage = "Currency name is too long.")]
         public string Currency { get; set; }
-        
+
         [DefaultValue(false)]
         public bool Accepted { get; set; }
 
@@ -44,7 +39,12 @@ namespace giSelleRemastered.Models
         public int ImageId { get; set; }
 
         public string UserId { get; set; }
+    }
 
+    public class Product : ProductAttributes
+    {
+        [Key]
+        public int Id { get; set; }
 
         public virtual ApplicationUser User { get; set; }
         public virtual UploadFile Image { get; set; }
@@ -55,10 +55,19 @@ namespace giSelleRemastered.Models
 
     }
 
-    public class ProductWithCategories : Product
+    public class ProductWithCategories : ProductAttributes
     {
+        public int Id { get; set; }
+
         [Required(ErrorMessage = "At least one category is mandatory.")]
         public int[] SelectedCategoryIds { get; set; }
+
+        public ApplicationUser User { get; set; }
+        public UploadFile Image { get; set; }
+        public List<Category> Categories { get; set; }
+        public List<Cart> Carts { get; set; }
+        public List<Comment> Comments { get; set; }
+        public List<Rating> Ratings { get; set; }
     }
 
     public class ProductView
@@ -75,7 +84,5 @@ namespace giSelleRemastered.Models
         public ApplicationUser User { get; set; }
         public UploadFile Image { get; set; }
         public ICollection<Category> Categories { get; set; }
-
-        public int[] SelectedCategoryIds { get; set; }
     }
 }
