@@ -26,33 +26,31 @@ namespace giSelleRemastered.Controllers
             var products = (from product in db.Products.Include("Categories")
                              orderby product.Name
                              select product).ToList();
-            ViewBag.ShowButtons = false;
-            if (User.IsInRole("Admin") || User.IsInRole("Partner"))
-                ViewBag.ShowButtons = true;
+            foreach(var prod in products)
+            {
+                System.Diagnostics.Debug.WriteLine(prod.Name);
+            }
+            ViewBag.ShowButtons = User.IsInRole("Admin") || User.IsInRole("Partner");
             return View(products);
         }
 
         public ActionResult Show(int id)
         {
             var product = db.Products.Include(i => i.Image)
-                                     .Include(i => i.User)
-                                     .Include(i => i.Comments)
-                                     .Where(p => p.Id == id).FirstOrDefault();
-            StateInitialisation(product);
+                                    .Include(i => i.User)
+                                    .Include(i => i.Comments)
+                                    .Where(p => p.Id == id).FirstOrDefault();
+            if (!product.Accepted)
+                return RedirectToAction("Index");
+            
+            StateInitialisation();
+            
             ViewBag.Comments = GetCommentsForProduct(product);
             ViewBag.CurrentUser = User.Identity.GetUserId();
 
-            ViewBag.IsAdmin = false;
-            if (User.IsInRole("Admin"))
-                ViewBag.IsAdmin = true;
-
-            ViewBag.ShowButtons = false;
-            if (User.IsInRole("Admin") || (User.IsInRole("Partner") && IsOwner(product.UserId)))
-                ViewBag.ShowButtons = true;
-
-            ViewBag.ShowAddComment = false;
-            if (User.IsInRole("Admin") || User.IsInRole("Partner") || User.IsInRole("User") )
-                ViewBag.ShowAddComment= true;
+            ViewBag.IsAdmin = User.IsInRole("Admin");
+            ViewBag.ShowButtons = User.IsInRole("Admin") || (User.IsInRole("Partner") && IsOwner(product.UserId));
+            ViewBag.ShowAddComment = User.IsInRole("Admin") || User.IsInRole("Partner") || User.IsInRole("User");
 
             return View(product);
         }
@@ -64,21 +62,13 @@ namespace giSelleRemastered.Controllers
             var product = db.Products.Include(i => i.Image)
                                      .Include(i => i.User)
                                      .Where(p => p.Id == comment.ProductId).FirstOrDefault();
-            StateInitialisation(product);
+            StateInitialisation();
             ViewBag.Comments = GetCommentsForProduct(product);
             ViewBag.CurrentUser = User.Identity.GetUserId();
-            
-            ViewBag.IsAdmin = false;
-            if(User.IsInRole("Admin"))
-                ViewBag.IsAdmin = true;
 
-            ViewBag.ShowButtons = false;
-            if (User.IsInRole("Admin") || (User.IsInRole("Partner") && IsOwner(product.UserId)))
-                ViewBag.ShowButtons = true;
-            
-            ViewBag.ShowAddComment = false;
-            if (User.IsInRole("Admin") || User.IsInRole("Partner") || User.IsInRole("User"))
-                ViewBag.ShowAddComment = true;
+            ViewBag.IsAdmin = User.IsInRole("Admin");
+            ViewBag.ShowButtons = User.IsInRole("Admin") || (User.IsInRole("Partner") && IsOwner(product.UserId));
+            ViewBag.ShowAddComment = User.IsInRole("Admin") || User.IsInRole("Partner") || User.IsInRole("User");
 
             comment.Date = DateTime.Now;
             comment.UserId = User.Identity.GetUserId();
@@ -104,14 +94,14 @@ namespace giSelleRemastered.Controllers
             {
                 ViewBag.Message = TempData["Message"].ToString();
             }
-            Product product = new Product();
+            Product product = new ProductWithCategories();
             StateInitialisation();
-            return View(product);
+            return View((ProductWithCategories)product);
         }
 
         [Authorize(Roles = "Admin,Partner")]
         [HttpPost]
-        public ActionResult New([Bind(Exclude = "ImageId,Image")]Product product, HttpPostedFileBase Image)
+        public ActionResult New([Bind(Exclude = "ImageId,Image,Accepted")]ProductWithCategories product, HttpPostedFileBase Image)
         {
             StateInitialisation();
             int imageId = ValidateAddImage(Image);
@@ -127,16 +117,15 @@ namespace giSelleRemastered.Controllers
                         Category category = db.Categories.Find(selectedCategoryId);
                         product.Categories.Add(category);
                     }
-
                     db.Products.Add(product);
                     db.SaveChanges();
-                    TempData["Message"] = "Product has been successfully added";
+                    TempData["Message"] = "Your request will be submited by admin";
                     return RedirectToAction("Index");
                 }
                 TempData["Message"] = "Product adding has been failed";
                 return View(product);
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 TempData["Message"] = "Product adding has been failed";
                 return View(product);
@@ -146,20 +135,20 @@ namespace giSelleRemastered.Controllers
         [Authorize(Roles = "Admin,Partner")]
         public ActionResult Edit(int id)
         {
-            Product product = db.Products.Find(id);
-            StateInitialisation(product);
-            return View(product);
+            Product product = (ProductWithCategories)db.Products.Find(id);
+            StateInitialisation((ProductWithCategories)product);
+            return View((ProductWithCategories)product);
         }
 
         [Authorize(Roles = "Admin,Partner")]
         [HttpPut]
-        public ActionResult Edit(int id, Product requestProduct)
+        public ActionResult Edit(int id, ProductWithCategories requestProduct)
         {
            
-            Product product = db.Products.Find(id);
+            Product product = (ProductWithCategories)db.Products.Find(id);
             if (IsOwner(product.UserId) || User.IsInRole("Admin"))
             {
-                StateInitialisation(product);
+                StateInitialisation((ProductWithCategories)product);
                 try
                 {
                     if (TryUpdateModel(product))
@@ -187,7 +176,7 @@ namespace giSelleRemastered.Controllers
                     return View(requestProduct);
 
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     TempData["Message"] = "Product editing has been failed";
                     return View(requestProduct);
@@ -274,7 +263,7 @@ namespace giSelleRemastered.Controllers
             return comments;
         }
 
-        public void StateInitialisation(Product product)
+        public void StateInitialisation(ProductWithCategories product)
         {
             StateInitialisation();
             product.SelectedCategoryIds = GetSelectedCategories(product);
@@ -285,7 +274,7 @@ namespace giSelleRemastered.Controllers
             ViewBag.Categories = GetAllCategories();
             ViewBag.Currencies = GetAllCurrencies();
         }
-
+        
 
         public int ValidateAddImage(HttpPostedFileBase image)
         {

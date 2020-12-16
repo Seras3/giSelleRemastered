@@ -1,0 +1,33 @@
+﻿
+@{
+    ViewBag.Title = "RequestIndex";
+}
+
+@model List<giSelleRemastered.Models.ProductView>
+
+<h2>Requests list</h2>
+
+<p class="text-info">@ViewBag.Message</p>
+
+<div>
+    @foreach (var product in Model)
+    {
+        if (!product.Accepted)
+        {
+            <hr />
+            <h3>@product.Name</h3>
+            <img src="@Url.Content(product.Image.Path.Replace(Request.ServerVariables["APPL_PHYSICAL_PATH"], "~/"))" class="img-responsive pull-right" style="max-width:250px; max-height:250px" />
+            <strong>Price : <span class="text-success">@product.PriceInMu @product.Currency</span></strong>
+            <br />
+            if (product.HasQuantity)
+            {
+                <strong class="text-info">In stock : @product.Quantity </strong>
+            }
+            <br />
+            <p>By: <strong>@product.User.UserName</strong></p>
+
+            <a class="btn btn-info" href="/Admin/RequestShow/@product.Id">Show</a>
+            <br />
+        }
+    }
+</div>

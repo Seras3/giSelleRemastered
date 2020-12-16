@@ -1,0 +1,61 @@
+﻿<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" href="/Home/Index">
+        <img src="~/Content/Icons/logo.svg" height="40" alt="giSelle">
+    </a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item">
+                <a class="nav-link" href="/Home/Index">Home</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/Home/About">About</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/Home/Contact">Contact</a>
+            </li>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Links
+                </a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    <a class="dropdown-item" href="/Product/Index">Products</a>
+                    <a class="dropdown-item" href="/Category/Index">Categories</a>
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="/Admin/UserIndex">Users</a>
+                        <a class="dropdown-item" href="/Admin/RequestIndex">Requests</a>
+                    }
+                </div>
+            </li>
+        </ul>
+        @Html.Partial("_LoginPartial")
+    </div>
+</nav>
+<!--
+<div class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            Html.ActionLink("giSelle", "Index", "Home", new { area = "" }, new { class = "navbar-brand" })
+        </div>
+        <div class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+                <li@Html.ActionLink("Home", "Index", "Home")</li>
+                <li>Html.ActionLink("About", "About", "Home")</li>
+                <li>Html.ActionLink("Contact", "Contact", "Home")</li>
+                <li>Html.ActionLink("Links", "Links", "Home")</li>
+            </ul>
+            Html.Partial("_LoginPartial")
+        </div>
+    </div>
+</div>
+-->

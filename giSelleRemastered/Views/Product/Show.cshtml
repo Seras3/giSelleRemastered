@@ -5,33 +5,11 @@
 
 @model giSelleRemastered.Models.Product
 
-<br />
-<div class="panel panel-default">
-    <div class="panel-body">
-        <img src="@Url.Content(Model.Image.Path.Replace(Request.ServerVariables["APPL_PHYSICAL_PATH"], "~/"))" alt="@Model.Name" class="img-responsive pull-right" style="max-width:250px; max-height:250px" />
-        <h3>@Model.Name</h3>
-        <br />
-        <p class="card-text">@Model.Description</p>
-        <Strong>Categories :</Strong>
-        @foreach (var category in Model.Categories)
-        {
-            <a href="/Category/Show/@category.Id">@category.Name |</a>
-        }
-        <br />
-        <strong>Price : <span class="text-success">@Model.PriceInMu @Model.Currency</span></strong>
-        <br />
-        @if (Model.HasQuantity)
-        {
-            <strong class="text-info">In stock : @Model.Quantity </strong>
-        }
-        <br />
-        <br />
-        Artist : <strong>@Model.User.UserName</strong>
-        <br />
-    </div>
+<div class="card">
+    @Html.Partial("_ProductBody", Model)
     @if (ViewBag.ShowButtons)
     {
-        <div class="panel-footer">
+        <div class="card-footer">
             <form method="post" action="/Product/Delete/@Model.Id">
                 @Html.HttpMethodOverride(HttpVerbs.Delete)
                 @if (ViewBag.ShowButtons)
@@ -45,7 +23,7 @@
     }
 </div>
 
-
+<br />
 @if (ViewBag.ShowAddComment)
 {
 <div class="row">

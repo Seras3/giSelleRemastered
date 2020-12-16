@@ -14,23 +14,26 @@
 <div>
     @foreach (Product product in Model)
     {
-        <h3>@product.Name</h3>
-        <Strong>Categories :</Strong>
-        foreach (var category in product.Categories)
+        if (product.Accepted)
         {
-            <a href="/Category/Show/@category.Id">@category.Name |</a>
-        }
-        <br /> 
-        <strong>Price : <span class="text-success">@product.PriceInMu @product.Currency</span></strong>
-        <br />
-        if (product.HasQuantity)
-        {
+            <h3>@product.Name</h3>
+            <Strong>Categories :</Strong>
+                foreach (var category in product.Categories)
+                {
+                <a href="/Category/Show/@category.Id">@category.Name |</a>
+                }
+            <br /> 
+            <strong>Price : <span class="text-success">@product.PriceInMu @product.Currency</span></strong>
+            <br />
+            if (product.HasQuantity)
+            {
             <strong class="text-info">In stock : @product.Quantity </strong>
+            }
+            <br />
+            <br />
+            <a class="btn btn-info" href="/Product/Show/@product.Id">Show</a>
+            <hr />
         }
-        <br />
-        <br />
-        <a class="btn btn-info" href="/Product/Show/@product.Id">Show</a>
-        <hr />
     }
 </div>
 

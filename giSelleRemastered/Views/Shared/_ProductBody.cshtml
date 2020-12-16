@@ -1,0 +1,23 @@
+﻿<div class="card-body">
+    <img src="@Url.Content(Model.Image.Path.Replace(Request.ServerVariables["APPL_PHYSICAL_PATH"], "~/"))" alt="@Model.Name" class="img-thumbnail float-right" style="max-width:250px; max-height:250px" />
+    <h3>@Model.Name</h3>
+    <br />
+    <p class="card-text">@Model.Description</p>
+    <Strong>Categories :</Strong>
+    @foreach (var category in Model.Categories)
+    {
+        <a href="/Category/Show/@category.Id">@category.Name |</a>
+    }
+    <br />
+    <strong>Price : <span class="text-success">@Model.PriceInMu @Model.Currency</span></strong>
+    <br />
+    @if (Model.HasQuantity)
+    {
+        <strong class="text-info">In stock : @Model.Quantity </strong>
+    }
+    <br />
+    <br />
+    Artist : <strong>@Model.User.UserName</strong>
+    <br />
+</div>
+

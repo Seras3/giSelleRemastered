@@ -1,0 +1,27 @@
+﻿
+@{
+    ViewBag.Title = "RequestIndex";
+}
+
+@model giSelleRemastered.Models.ProductView
+
+<h2>Requests list</h2>
+
+<p class="text-info">@ViewBag.Message</p>
+
+<div class="card">
+    @Html.Partial("~/Views/Shared/Product/_RequestBody.cshtml", Model)
+    <div class="card-footer">
+        <div class="btn-group">
+            <form method="POST" action="/Admin/RequestResponse/@Model.Id">
+                <input type="hidden" name="accepted" value="True" />
+                <button type="submit" class="btn btn-success">Accept</button>
+            </form>
+
+            <form method="POST" action="/Admin/RequestResponse/@Model.Id">
+                <input type="hidden" name="accepted" value="False" />
+                <button type="submit" class="btn btn-danger">Reject</button>
+            </form>
+        </div>
+    </div>
+</div>

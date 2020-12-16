@@ -67,7 +67,7 @@ namespace giSelleRemastered.Controllers
                 TempData["Message"] = "Category adding has been failed";
                 return View(category);
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 TempData["Message"] = "Category adding has been failed";
                 return View(category);
@@ -98,7 +98,7 @@ namespace giSelleRemastered.Controllers
                 return View(requestCategory);
 
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 TempData["Message"] = "Category editing has been failed";
                 return View(requestCategory);
@@ -112,7 +112,73 @@ namespace giSelleRemastered.Controllers
             db.Categories.Remove(category);
             TempData["Message"] = "Category has been removed";
             db.SaveChanges();
-            return Redirect("/Category/Index");
+            return RedirectToAction("Index","Category");
+        }
+
+        public ActionResult RequestIndex()
+        {
+            if (TempData.ContainsKey("Message"))
+            {
+                ViewBag.Message = TempData["Message"];
+            }
+            var requests = db.Products.Include("User")
+                                      .Include("Image")
+                                      .Include("Categories").ToList();
+            List<ProductView> prodViews = new List<ProductView>();
+            foreach(var req in requests)
+            {
+                prodViews.Add(ProductToView(req));
+            }
+            return View(prodViews);
+        }
+
+        public ActionResult RequestShow(int id)
+        {
+            var request = db.Products.Include("User")
+                                     .Include("Image")
+                                     .Include("Categories")
+                                     .Where(i => i.Id == id).FirstOrDefault();
+            if (request.Accepted)
+                return RedirectToAction("RequestIndex");
+            
+            return View(ProductToView(request));
+        }
+
+        [HttpPost]
+        public ActionResult RequestResponse(int id, ProductView requestedProduct)
+        {
+            Product product = db.Products.Find(id);
+            if (requestedProduct.Accepted)
+            {
+                if (TryUpdateModel(product,null, new string[] {"Accepted"}))
+                {
+                    product.Accepted = true;
+                    db.SaveChanges();
+                    TempData["Message"] = "Product has been accepted";
+                    return Redirect("/Admin/RequestIndex");
+                }
+                else
+                {
+                    foreach (var modelState in ModelState.Values)
+                    {
+                        foreach (var error in modelState.Errors)
+                        {
+                            System.Diagnostics.Debug.WriteLine(error.ErrorMessage);
+                        }
+                    }
+                }
+                TempData["Message"] = "Something went wrong";
+                return RedirectToAction("RequestIndex");
+            }
+            else
+            {
+                db.Products.Remove(product);
+                db.SaveChanges();
+                TempData["Message"] = "Product has been rejected";
+                // Stergem si poza adaugata ? (daca nu e default)
+                return Redirect("/Admin/RequestIndex");
+            }
+            
         }
 
         public IEnumerable<SelectListItem> GetAllRoles()
@@ -133,6 +199,36 @@ namespace giSelleRemastered.Controllers
                 });
             }
             return selectList;
+        }
+
+        public ProductView ProductToView(Product req)
+        {
+            ProductView pv = new ProductView
+            {
+                Id = req.Id,
+                Name = req.Name,
+                Description = req.Description,
+                HasQuantity = req.HasQuantity,
+                Quantity = req.Quantity,
+                PriceInMu = req.PriceInMu,
+                Currency = req.Currency,
+                Accepted = req.Accepted,
+                Image = req.Image,
+                User = req.User,
+                Categories = req.Categories
+            };
+            return pv;
+        }
+
+        [NonAction]
+        public int[] GetSelectedCategories(Product product)
+        {
+            var categories = new List<int>();
+            foreach (var category in product.Categories)
+            {
+                categories.Add(category.Id);
+            }
+            return categories.ToArray();
         }
     }
 }

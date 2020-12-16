@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
@@ -35,6 +36,9 @@ namespace giSelleRemastered.Models
         [RegularExpression(@"^RON|EUR|USD$", ErrorMessage = "Unkown currency.")]
         [StringLength(5, ErrorMessage = "Currency name is too long.")]
         public string Currency { get; set; }
+        
+        [DefaultValue(false)]
+        public bool Accepted { get; set; }
 
         [ForeignKey("Image")]
         public int ImageId { get; set; }
@@ -49,8 +53,29 @@ namespace giSelleRemastered.Models
         public virtual ICollection<Comment> Comments { get; set; }
         public virtual ICollection<Rating> Ratings { get; set; }
 
+    }
+
+    public class ProductWithCategories : Product
+    {
         [Required(ErrorMessage = "At least one category is mandatory.")]
         public int[] SelectedCategoryIds { get; set; }
+    }
 
+    public class ProductView
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public string Description { get; set; }
+        public bool HasQuantity { get; set; }
+        public int Quantity { get; set; }
+        public float PriceInMu { get; set; }
+        public string Currency { get; set; }
+        public bool Accepted { get; set; }
+
+        public ApplicationUser User { get; set; }
+        public UploadFile Image { get; set; }
+        public ICollection<Category> Categories { get; set; }
+
+        public int[] SelectedCategoryIds { get; set; }
     }
 }
