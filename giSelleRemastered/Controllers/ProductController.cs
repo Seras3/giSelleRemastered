@@ -56,6 +56,7 @@ namespace giSelleRemastered.Controllers
         [Authorize(Roles = "Admin,Partner,User")]
         public ActionResult Show(Comment comment)
         {
+            // TODO: This is a little bit misleading, it posts a comment when viewing a product
             var product = db.Products.Include(i => i.Image)
                                      .Include(i => i.User)
                                      .Include(i => i.Comments)
@@ -105,7 +106,7 @@ namespace giSelleRemastered.Controllers
         public ActionResult New([Bind(Exclude = "ImageId,Image,Accepted")]ProductWithCategories newProduct, HttpPostedFileBase Image)
         {
             StateInitialisation();
-            int imageId = ValidateAddImage(Image);
+            int imageId = UploadAndGetImageId(Image);
             newProduct.ImageId = imageId;
             newProduct.UserId = User.Identity.GetUserId();
             try
@@ -273,34 +274,35 @@ namespace giSelleRemastered.Controllers
         }
         
 
-        public int ValidateAddImage(HttpPostedFileBase image)
+        public int UploadAndGetImageId(HttpPostedFileBase image)
         {
             if (image != null && image.ContentLength > 0)
             {
                 UploadFile dbImage = new UploadFile();
                 try
                 {
-                    string path = Path.Combine(Server.MapPath("~/Content/Images/Products"),
+                    string path = Path.Combine(Server.MapPath(Configuration.FILE_UPLOAD_PATH),
                                         Path.GetFileName(image.FileName)); // physical path
+                    image.SaveAs(path);
 
                     // TODO: Add extension constraints
                     dbImage.Extension = Path.GetExtension(image.FileName);
                     dbImage.Name = Path.GetFileNameWithoutExtension(image.FileName);
                     dbImage.FileId = GetFileIdToAdd();
-                    image.SaveAs(path);
                     db.UploadFiles.Add(dbImage);
                     db.SaveChanges();
+                    
                     ViewBag.Message = "File uploaded successfully";
                 }
                 catch (Exception ex)
                 {
-                    ViewBag.Message = "ERROR:" + ex.Message.ToString();
-                    return 0;
+                    ViewBag.Message = "Error while uploading image:" + ex.Message.ToString();
+                    return Configuration.DEFAULT_IMAGE_ID;
                 }
                 return dbImage.FileId;
             }
             else
-                return 0;
+                return Configuration.DEFAULT_IMAGE_ID;
         }
 
         public int GetFileIdToAdd()

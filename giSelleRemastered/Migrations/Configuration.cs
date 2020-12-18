@@ -1,6 +1,5 @@
 ﻿namespace giSelleRemastered.Migrations
 {
-    using giSelleRemastered.Models;
     using System.Data.Entity.Migrations;
 
     internal sealed class Configuration : DbMigrationsConfiguration<giSelleRemastered.Models.ApplicationDbContext>
@@ -12,13 +11,13 @@
             ContextKey = "giSelleRemastered.ApplicationDbContext";
         }
 
-        protected override void Seed(ApplicationDbContext context)
+        protected override void Seed(Models.ApplicationDbContext context)
         {
-            if (context.UploadFiles.Find(0) == null)
+            if (context.UploadFiles.Find(Models.Configuration.DEFAULT_IMAGE_ID) == null)
             {
-                UploadFile defaultProductImage = new UploadFile
+                Models.UploadFile defaultProductImage = new Models.UploadFile
                 {
-                    FileId = 0,
+                    FileId = Models.Configuration.DEFAULT_IMAGE_ID,
                     Name = "default",
                     Extension = ".jpg"
                 };

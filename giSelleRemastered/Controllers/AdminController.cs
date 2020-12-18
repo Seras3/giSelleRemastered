@@ -171,7 +171,7 @@ namespace giSelleRemastered.Controllers
                 db.Products.Remove(product);
                 db.SaveChanges();
                 TempData["Message"] = "Product has been rejected";
-                // Stergem si poza adaugata ? (daca nu e default)
+                // TODO: Stergem si poza adaugata ? (daca nu e default)
                 return Redirect("/Admin/RequestIndex");
             }
             

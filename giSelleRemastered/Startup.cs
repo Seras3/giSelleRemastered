@@ -19,38 +19,27 @@ namespace giSelleRemastered
         private void createAdminUserAndApplicationRoles()
         {
             ApplicationDbContext context = new ApplicationDbContext();
-            var roleManager = new RoleManager<IdentityRole>(new
-            RoleStore<IdentityRole>(context));
-            var UserManager = new UserManager<ApplicationUser>(new
-            UserStore<ApplicationUser>(context));
+            var roleManager = new RoleManager<IdentityRole>(new RoleStore<IdentityRole>(context));
+            var userManager = new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(context));
             
-            if (!roleManager.RoleExists("Admin"))
+            foreach (var roleName in UserRoleType.ALL)
             {
-                
-                var role = new IdentityRole();
-                role.Name = "Admin";
-                roleManager.Create(role);
-                
-                var user = new ApplicationUser();
-                user.UserName = "admin@admin.com";
-                user.Email = "admin@admin.com";
-                var adminCreated = UserManager.Create(user, "Admin1!");
-                if (adminCreated.Succeeded)
+                if (!roleManager.RoleExists(roleName))
                 {
-                    UserManager.AddToRole(user.Id, "Admin");
+                    roleManager.Create(new IdentityRole { Name = roleName });
+                    if (roleName == UserRoleType.ADMIN)
+                    {
+                        var defaultAdminEmail = "admin@admin.com";
+                        var defaultAdminPassword = "Admin1!";
+
+                        var user = new ApplicationUser { UserName = defaultAdminEmail, Email = defaultAdminEmail };
+                        var adminCreated = userManager.Create(user, defaultAdminPassword);
+                        if (adminCreated.Succeeded)
+                        {
+                            userManager.AddToRole(user.Id, UserRoleType.ADMIN);
+                        }
+                    }
                 }
-            }
-            if (!roleManager.RoleExists("Partner"))
-            {
-                var role = new IdentityRole();
-                role.Name = "Partner";
-                roleManager.Create(role);
-            }
-            if (!roleManager.RoleExists("User"))
-            {
-                var role = new IdentityRole();
-                role.Name = "User";
-                roleManager.Create(role);
             }
         }
     }

@@ -29,9 +29,7 @@ namespace giSelleRemastered.Controllers
 
         public ActionResult Links()
         {
-            ViewBag.IsAdmin = false;
-            if (User.IsInRole("Admin"))
-                ViewBag.IsAdmin = true;
+            ViewBag.IsAdmin = User.IsInRole("Admin");
             return View();
         }
     }
