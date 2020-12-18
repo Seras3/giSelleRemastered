@@ -184,9 +184,13 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202011231723055_Initial.cs" />
-    <Compile Include="Migrations\202011231723055_Initial.designer.cs">
-      <DependentUpon>202011231723055_Initial.cs</DependentUpon>
+    <Compile Include="Migrations\202012181025595_InitialSchema.cs" />
+    <Compile Include="Migrations\202012181025595_InitialSchema.designer.cs">
+      <DependentUpon>202012181025595_InitialSchema.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202012181200449_SimplerFileUpload.cs" />
+    <Compile Include="Migrations\202012181200449_SimplerFileUpload.designer.cs">
+      <DependentUpon>202012181200449_SimplerFileUpload.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
@@ -392,11 +396,6 @@
     <Content Include="Views\Shared\_ProductBody.cshtml" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\202011231723055_Initial.resx">
-      <DependentUpon>202011231723055_Initial.cs</DependentUpon>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="packages.config">
       <SubType>Designer</SubType>
     </None>
@@ -410,6 +409,14 @@
   </ItemGroup>
   <ItemGroup>
     <Service Include="{4A0DDDB5-7A95-4FBF-97CC-616D07737A77}" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\202012181025595_InitialSchema.resx">
+      <DependentUpon>202012181025595_InitialSchema.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202012181200449_SimplerFileUpload.resx">
+      <DependentUpon>202012181200449_SimplerFileUpload.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
