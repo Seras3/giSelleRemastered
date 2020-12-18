@@ -7,13 +7,13 @@ namespace giSelleRemastered.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.4.4")]
-    public sealed partial class Initial : IMigrationMetadata
+    public sealed partial class SimplerFileUpload : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(Initial));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(SimplerFileUpload));
         
         string IMigrationMetadata.Id
         {
-            get { return "202011231723055_Initial"; }
+            get { return "202012181200449_SimplerFileUpload"; }
         }
         
         string IMigrationMetadata.Source

@@ -3,7 +3,7 @@
     using System;
     using System.Data.Entity.Migrations;
     
-    public partial class Initial : DbMigration
+    public partial class InitialSchema : DbMigration
     {
         public override void Up()
         {
@@ -12,6 +12,7 @@
                 c => new
                     {
                         Id = c.Int(nullable: false, identity: true),
+                        UserId = c.Int(nullable: false),
                         User_Id = c.String(maxLength: 128),
                     })
                 .PrimaryKey(t => t.Id)
@@ -23,24 +24,47 @@
                 c => new
                     {
                         Id = c.Int(nullable: false, identity: true),
-                        Name = c.String(),
-                        Description = c.String(),
-                        SKU = c.String(),
+                        Name = c.String(nullable: false, maxLength: 256),
+                        Description = c.String(nullable: false),
                         HasQuantity = c.Boolean(nullable: false),
                         Quantity = c.Int(nullable: false),
                         PriceInMu = c.Single(nullable: false),
-                        Currency = c.String(),
+                        Currency = c.String(nullable: false, maxLength: 5),
+                        Accepted = c.Boolean(nullable: false),
+                        ImageId = c.Int(nullable: false),
+                        UserId = c.String(maxLength: 128),
                     })
-                .PrimaryKey(t => t.Id);
+                .PrimaryKey(t => t.Id)
+                .ForeignKey("dbo.UploadFiles", t => t.ImageId, cascadeDelete: true)
+                .ForeignKey("dbo.AspNetUsers", t => t.UserId)
+                .Index(t => t.ImageId)
+                .Index(t => t.UserId);
             
             CreateTable(
                 "dbo.Categories",
                 c => new
                     {
                         Id = c.Int(nullable: false, identity: true),
-                        Name = c.Int(nullable: false),
+                        Name = c.String(nullable: false, maxLength: 256),
                     })
-                .PrimaryKey(t => t.Id);
+                .PrimaryKey(t => t.Id)
+                .Index(t => t.Name, unique: true);
+            
+            CreateTable(
+                "dbo.Comments",
+                c => new
+                    {
+                        Id = c.Int(nullable: false, identity: true),
+                        UserId = c.String(maxLength: 128),
+                        ProductId = c.Int(nullable: false),
+                        Content = c.String(nullable: false, maxLength: 1000),
+                        Date = c.DateTime(nullable: false),
+                    })
+                .PrimaryKey(t => t.Id)
+                .ForeignKey("dbo.Products", t => t.ProductId, cascadeDelete: true)
+                .ForeignKey("dbo.AspNetUsers", t => t.UserId)
+                .Index(t => t.UserId)
+                .Index(t => t.ProductId);
             
             CreateTable(
                 "dbo.AspNetUsers",
@@ -76,6 +100,34 @@
                 .Index(t => t.UserId);
             
             CreateTable(
+                "dbo.Invoices",
+                c => new
+                    {
+                        Id = c.Int(nullable: false, identity: true),
+                        UserId = c.Int(nullable: false),
+                        Date = c.DateTime(nullable: false),
+                        User_Id = c.String(maxLength: 128),
+                    })
+                .PrimaryKey(t => t.Id)
+                .ForeignKey("dbo.AspNetUsers", t => t.User_Id)
+                .Index(t => t.User_Id);
+            
+            CreateTable(
+                "dbo.InvoiceLines",
+                c => new
+                    {
+                        Id = c.Int(nullable: false, identity: true),
+                        ProductId = c.Int(nullable: false),
+                        Quantity = c.Int(nullable: false),
+                        Invoice_Id = c.Int(),
+                    })
+                .PrimaryKey(t => t.Id)
+                .ForeignKey("dbo.Products", t => t.ProductId, cascadeDelete: true)
+                .ForeignKey("dbo.Invoices", t => t.Invoice_Id)
+                .Index(t => t.ProductId)
+                .Index(t => t.Invoice_Id);
+            
+            CreateTable(
                 "dbo.AspNetUserLogins",
                 c => new
                     {
@@ -86,6 +138,22 @@
                 .PrimaryKey(t => new { t.LoginProvider, t.ProviderKey, t.UserId })
                 .ForeignKey("dbo.AspNetUsers", t => t.UserId, cascadeDelete: true)
                 .Index(t => t.UserId);
+            
+            CreateTable(
+                "dbo.Ratings",
+                c => new
+                    {
+                        Id = c.Int(nullable: false, identity: true),
+                        ProductId = c.Int(nullable: false),
+                        UserId = c.Int(nullable: false),
+                        Value = c.Int(nullable: false),
+                        User_Id = c.String(maxLength: 128),
+                    })
+                .PrimaryKey(t => t.Id)
+                .ForeignKey("dbo.Products", t => t.ProductId, cascadeDelete: true)
+                .ForeignKey("dbo.AspNetUsers", t => t.User_Id)
+                .Index(t => t.ProductId)
+                .Index(t => t.User_Id);
             
             CreateTable(
                 "dbo.AspNetUserRoles",
@@ -101,31 +169,15 @@
                 .Index(t => t.RoleId);
             
             CreateTable(
-                "dbo.InvoiceLines",
+                "dbo.UploadFiles",
                 c => new
                     {
-                        Id = c.Int(nullable: false, identity: true),
-                        Quantity = c.Int(nullable: false),
-                        Product_Id = c.Int(),
-                        Invoice_Id = c.Int(),
+                        FileId = c.Int(nullable: false),
+                        Path = c.String(),
+                        Name = c.String(),
+                        Extension = c.String(),
                     })
-                .PrimaryKey(t => t.Id)
-                .ForeignKey("dbo.Products", t => t.Product_Id)
-                .ForeignKey("dbo.Invoices", t => t.Invoice_Id)
-                .Index(t => t.Product_Id)
-                .Index(t => t.Invoice_Id);
-            
-            CreateTable(
-                "dbo.Invoices",
-                c => new
-                    {
-                        Id = c.Int(nullable: false, identity: true),
-                        Date = c.DateTime(nullable: false),
-                        User_Id = c.String(maxLength: 128),
-                    })
-                .PrimaryKey(t => t.Id)
-                .ForeignKey("dbo.AspNetUsers", t => t.User_Id)
-                .Index(t => t.User_Id);
+                .PrimaryKey(t => t.FileId);
             
             CreateTable(
                 "dbo.AspNetRoles",
@@ -168,13 +220,19 @@
         public override void Down()
         {
             DropForeignKey("dbo.AspNetUserRoles", "RoleId", "dbo.AspNetRoles");
+            DropForeignKey("dbo.Carts", "User_Id", "dbo.AspNetUsers");
+            DropForeignKey("dbo.Products", "UserId", "dbo.AspNetUsers");
+            DropForeignKey("dbo.Products", "ImageId", "dbo.UploadFiles");
+            DropForeignKey("dbo.AspNetUserRoles", "UserId", "dbo.AspNetUsers");
+            DropForeignKey("dbo.Ratings", "User_Id", "dbo.AspNetUsers");
+            DropForeignKey("dbo.Ratings", "ProductId", "dbo.Products");
+            DropForeignKey("dbo.AspNetUserLogins", "UserId", "dbo.AspNetUsers");
             DropForeignKey("dbo.Invoices", "User_Id", "dbo.AspNetUsers");
             DropForeignKey("dbo.InvoiceLines", "Invoice_Id", "dbo.Invoices");
-            DropForeignKey("dbo.InvoiceLines", "Product_Id", "dbo.Products");
-            DropForeignKey("dbo.Carts", "User_Id", "dbo.AspNetUsers");
-            DropForeignKey("dbo.AspNetUserRoles", "UserId", "dbo.AspNetUsers");
-            DropForeignKey("dbo.AspNetUserLogins", "UserId", "dbo.AspNetUsers");
+            DropForeignKey("dbo.InvoiceLines", "ProductId", "dbo.Products");
+            DropForeignKey("dbo.Comments", "UserId", "dbo.AspNetUsers");
             DropForeignKey("dbo.AspNetUserClaims", "UserId", "dbo.AspNetUsers");
+            DropForeignKey("dbo.Comments", "ProductId", "dbo.Products");
             DropForeignKey("dbo.CategoryProducts", "Product_Id", "dbo.Products");
             DropForeignKey("dbo.CategoryProducts", "Category_Id", "dbo.Categories");
             DropForeignKey("dbo.ProductCarts", "Cart_Id", "dbo.Carts");
@@ -184,24 +242,34 @@
             DropIndex("dbo.ProductCarts", new[] { "Cart_Id" });
             DropIndex("dbo.ProductCarts", new[] { "Product_Id" });
             DropIndex("dbo.AspNetRoles", "RoleNameIndex");
-            DropIndex("dbo.Invoices", new[] { "User_Id" });
-            DropIndex("dbo.InvoiceLines", new[] { "Invoice_Id" });
-            DropIndex("dbo.InvoiceLines", new[] { "Product_Id" });
             DropIndex("dbo.AspNetUserRoles", new[] { "RoleId" });
             DropIndex("dbo.AspNetUserRoles", new[] { "UserId" });
+            DropIndex("dbo.Ratings", new[] { "User_Id" });
+            DropIndex("dbo.Ratings", new[] { "ProductId" });
             DropIndex("dbo.AspNetUserLogins", new[] { "UserId" });
+            DropIndex("dbo.InvoiceLines", new[] { "Invoice_Id" });
+            DropIndex("dbo.InvoiceLines", new[] { "ProductId" });
+            DropIndex("dbo.Invoices", new[] { "User_Id" });
             DropIndex("dbo.AspNetUserClaims", new[] { "UserId" });
             DropIndex("dbo.AspNetUsers", "UserNameIndex");
+            DropIndex("dbo.Comments", new[] { "ProductId" });
+            DropIndex("dbo.Comments", new[] { "UserId" });
+            DropIndex("dbo.Categories", new[] { "Name" });
+            DropIndex("dbo.Products", new[] { "UserId" });
+            DropIndex("dbo.Products", new[] { "ImageId" });
             DropIndex("dbo.Carts", new[] { "User_Id" });
             DropTable("dbo.CategoryProducts");
             DropTable("dbo.ProductCarts");
             DropTable("dbo.AspNetRoles");
-            DropTable("dbo.Invoices");
-            DropTable("dbo.InvoiceLines");
+            DropTable("dbo.UploadFiles");
             DropTable("dbo.AspNetUserRoles");
+            DropTable("dbo.Ratings");
             DropTable("dbo.AspNetUserLogins");
+            DropTable("dbo.InvoiceLines");
+            DropTable("dbo.Invoices");
             DropTable("dbo.AspNetUserClaims");
             DropTable("dbo.AspNetUsers");
+            DropTable("dbo.Comments");
             DropTable("dbo.Categories");
             DropTable("dbo.Products");
             DropTable("dbo.Carts");
