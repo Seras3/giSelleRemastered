@@ -145,9 +145,8 @@ namespace giSelleRemastered.Controllers
                 var result = await UserManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
+                    await UserManager.AddToRoleAsync(user.Id, "User");
                     await SignInManager.SignInAsync(user, isPersistent:false, rememberBrowser:false);
-
-                    UserManager.AddToRole(user.Id, "User");
                     return Redirect("/Home/Index");
                 }
                 AddErrors(result);
