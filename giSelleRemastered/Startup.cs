@@ -4,7 +4,7 @@ using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.Owin;
 using Owin;
 
-[assembly: OwinStartupAttribute(typeof(giSelleRemastered.Startup))]
+[assembly: OwinStartup(typeof(giSelleRemastered.Startup))]
 namespace giSelleRemastered
 {
     public partial class Startup
