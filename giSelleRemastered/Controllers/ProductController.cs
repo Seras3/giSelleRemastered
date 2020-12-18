@@ -129,8 +129,8 @@ namespace giSelleRemastered.Controllers
             }
             catch (Exception)
             {
-                TempData["Message"] = "Product adding has been failed";
-                return View(newProduct);
+               TempData["Message"] = "Product adding has been failed";
+               return View(newProduct);
             }
         }
 
@@ -281,9 +281,9 @@ namespace giSelleRemastered.Controllers
                 try
                 {
                     string path = Path.Combine(Server.MapPath("~/Content/Images/Products"),
-                                               Path.GetFileName(image.FileName));
-                    dbImage.Path = path;
-                    // Add extension constraints
+                                        Path.GetFileName(image.FileName)); // physical path
+
+                    // TODO: Add extension constraints
                     dbImage.Extension = Path.GetExtension(image.FileName);
                     dbImage.Name = Path.GetFileNameWithoutExtension(image.FileName);
                     dbImage.FileId = GetFileIdToAdd();

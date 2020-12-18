@@ -16,7 +16,7 @@
         {
             <div class="card">
                 <div class="card-body">
-                    <img src="@Url.Content(product.Image.Path.Replace(Request.ServerVariables["APPL_PHYSICAL_PATH"], "~/"))" class="img-thumbnail float-right" style="max-width:250px; max-height:250px" />
+                    <img src="@Url.Content("~/Content/Images/Products/" + product.Image.Name + product.Image.Extension)" class="img-thumbnail float-right" style="max-width:250px; max-height:250px" />
                     <h3>@product.Name</h3>
                     <br />
                     <Strong>Categories :</Strong>
