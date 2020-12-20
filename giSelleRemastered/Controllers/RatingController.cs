@@ -1,6 +1,9 @@
 ﻿using giSelleRemastered.Models;
+using Microsoft.AspNet.Identity;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
@@ -9,94 +12,38 @@ namespace giSelleRemastered.Controllers
 {
     public class RatingController : Controller
     {
-        ApplicationDbContext db = new ApplicationDbContext();
-
-        // GET: Rating
-        public ActionResult Index()
-        {
-            if (TempData.ContainsKey("Message"))
-            {
-                ViewBag.Message = TempData["Message"].ToString();
-            }
-
-            var ratings = from rating in db.Ratings
-                           select rating;
-
-            ViewBag.Ratings = ratings;
-            return View();
-        }
-
-        public ActionResult Show(int id)
-        {
-            Rating rating = db.Ratings.Find(id);
-            return View(rating);
-        }
-
-        public ActionResult New()
-        {
-            return View();
-        }
+        private ApplicationDbContext db = new ApplicationDbContext();
 
         [HttpPost]
-        public ActionResult New(Rating rating)
+        public ActionResult New(int id, Rating rating)
         {
-            try
+            int productId = id;
+            rating.UserId = User.Identity.GetUserId();
+            rating.ProductId = productId;
+            // For not passing UserId as hidden input
+            ModelState.Clear();
+            Rating dbRating = db.Ratings.Where(i => i.UserId == rating.UserId &&
+                                                 i.ProductId == rating.ProductId).FirstOrDefault();
+
+            if (Enumerable.Range(1, 5).Contains(rating.Value))
             {
-                if (ModelState.IsValid)
+                if (dbRating == null)
                 {
                     db.Ratings.Add(rating);
-                    db.SaveChanges();
-                    TempData["Message"] = "Rating has been successfully added";
-                    return RedirectToAction("Index");
+                    db.SaveChanges();   
                 }
-                TempData["Message"] = "Rating adding has been failed";
-                return View(rating);
-            }
-            catch (Exception e)
-            {
-                TempData["Message"] = "Rating adding has been failed";
-                return View(rating);
-            }
-        }
-
-        public ActionResult Edit(int id)
-        {
-            Rating rating = db.Ratings.Find(id);
-            return View(rating);
-        }
-
-        [HttpPut]
-        public ActionResult Edit(int id, Rating requestRating)
-        {
-            try
-            {
-                Rating rating = db.Ratings.Find(id);
-                if (TryUpdateModel(rating))
+                else if(dbRating.Value == rating.Value)
                 {
+                    db.Ratings.Remove(dbRating);
                     db.SaveChanges();
-                    TempData["Message"] = "Rating has been successfully changed";
-                    return RedirectToAction("Index");
                 }
-
-                TempData["Message"] = "Rating editing has been failed";
-                return View(requestRating);
-
+                else if (TryUpdateModel(dbRating, null, new string[] { "Value" }))
+                {
+                    dbRating.Value = rating.Value;
+                    db.SaveChanges();   
+                }
             }
-            catch (Exception e)
-            {
-                TempData["Message"] = "Rating editing has been failed";
-                return View(requestRating);
-            }
-        }
-
-        [HttpDelete]
-        public ActionResult Delete(int id)
-        {
-            Rating rating = db.Ratings.Find(id);
-            db.Ratings.Remove(rating);
-            TempData["Message"] = "Rating has been removed";
-            db.SaveChanges();
-            return RedirectToAction("Index");
+            return Redirect("/Product/Show/"+ productId);
         }
     }
 }

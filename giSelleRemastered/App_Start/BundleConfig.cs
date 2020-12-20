@@ -12,7 +12,8 @@ namespace giSelleRemastered
 
             bundles.Add(new StyleBundle("~/Content/css").Include(
                       "~/Content/bootstrap.css",
-                      "~/Content/bootstrap-responsive.css"));
+                      "~/Content/bootstrap-responsive.css",
+                      "~/Content/Site.css"));
         }
     }
 }

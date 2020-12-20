@@ -7,48 +7,70 @@
 
 <div class="card">
     @Html.Partial("_ProductBody", Model)
-    @if (ViewBag.ShowButtons)
+
+    @if (User.IsInRole("User") || User.IsInRole("Partner") || User.IsInRole("Admin"))
     {
-        <div class="card-footer">
-            <form method="post" action="/Product/Delete/@Model.Id">
-                @Html.HttpMethodOverride(HttpVerbs.Delete)
-                @if (ViewBag.ShowButtons)
-                {
-                    <a class="btn btn-primary pull-left" href="/Product/Edit/@Model.Id">Edit</a>
-                }
-                <button type="submit" class="btn btn-danger pull-right">Delete</button>
-            </form>
-            <div class="clearfix"></div>
+    <div class="card-footer d-flex justify-content-between align-items-center">
+        <div>
+            @if ((User.IsInRole("Partner") && Model.UserId == ViewBag.CurrentUser) || User.IsInRole("Admin"))
+            {
+                <a class="btn btn-primary" href="/Product/Edit/@Model.Id">Edit</a>
+            }
         </div>
+        <form class="rate" method="post" action="/Rating/New/@Model.Id" id="rate">
+            @for (var i = 5; i >= 1; i--)
+            {
+                if (ViewBag.RateValue == i)
+                {
+                    <input type="radio" id="star_@i" name="Value" value="@i" checked />
+                }
+                else
+                {
+                    <input type="radio" id="star_@i" name="Value" value="@i" />
+                }
+                <label for="star_@i">@i stars</label>
+            }
+        </form>
+        <div>
+            @if ((User.IsInRole("Partner") && Model.UserId == ViewBag.CurrentUser) || User.IsInRole("Admin"))
+            {
+                <form method="post" action="/Product/Delete/@Model.Id">
+                    @Html.HttpMethodOverride(HttpVerbs.Delete)
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+            }
+        </div>
+    </div>
     }
 </div>
 
 <br />
-@if (ViewBag.ShowAddComment)
+@if (User.IsInRole("Admin") || User.IsInRole("Partner") || User.IsInRole("User"))
 {
-<div class="row">
-    <div class="col-md-2"></div>
-    <div class="col-md-8">
-        <div class="panel">
-            <form method="post" action="/Product/Show/@Model.Id">
-                <div class="panel-body">
-                    <input type="hidden" name="ProductId" value="@Model.Id" />
-                    <br />
-                    <textarea class="form-control" name="Content"></textarea>
-                    @Html.ValidationMessage("Content", "", new { @class = "text-danger" })
-                    <br />
-                    <button class="btn btn-success" type="submit">Post comment</button>
-                </div>
-            </form>
+    <div class="row">
+        <div class="col-md-2"></div>
+        <div class="col-md-8">
+            <div class="panel">
+                <form method="post" action="/Product/Show/@Model.Id">
+                    <div class="panel-body">
+                        <input type="hidden" name="ProductId" value="@Model.Id" />
+                        <br />
+                        <textarea class="form-control" name="Content"></textarea>
+                        @Html.ValidationMessage("Content", "", new { @class = "text-danger" })
+                        <br />
+                        <button class="btn btn-success" type="submit">Post comment</button>
+                    </div>
+                </form>
+            </div>
         </div>
+        <div class="col-md-2"></div>
     </div>
-    <div class="col-md-2"></div>
-</div>
-<br />
+    <br />
 }
 
 @foreach (var comm in ViewBag.Comments)
 {
+    <hr />
     <div class="container">
         <div class="row">
             <div class="col-md-2"></div>
@@ -66,8 +88,8 @@
                         <a class="btn btn-sm btn-primary" href="/Comment/Edit/@comm.Id">Edit</a>
                     </div>
                 }
-                @if (ViewBag.CurrentUser == comm.UserId || ViewBag.IsAdmin)
-                { 
+                @if (ViewBag.CurrentUser == comm.UserId || User.IsInRole("Admin"))
+                {
                     <div style="display: inline-block; float : left;">
                         <form method="post" action="/Comment/Delete/@comm.Id">
                             @Html.HttpMethodOverride(HttpVerbs.Delete)
@@ -79,5 +101,21 @@
             <div class="col-md-2"></div>
         </div>
     </div>
-    <hr />
+}
+
+@if (User.IsInRole("Admin") || User.IsInRole("Partner") || User.IsInRole("User"))
+{
+@section Scripts {
+    <script type="text/javascript">
+        window.addEventListener("DOMContentLoaded", function () {
+            var form = document.getElementById('rate');
+
+            for (let i = 1; i <= 5; i++) {
+                document.getElementById("star_" + i).addEventListener("click", function () {
+                    form.submit();
+                });
+            }
+        });
+    </script>
+}
 }

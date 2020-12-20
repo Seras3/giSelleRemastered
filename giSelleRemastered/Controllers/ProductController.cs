@@ -33,6 +33,7 @@ namespace giSelleRemastered.Controllers
 
         public ActionResult Show(int id)
         {
+            string userId = User.Identity.GetUserId();
             var product = db.Products.Include(i => i.Image)
                                     .Include(i => i.User)
                                     .Include(i => i.Comments)
@@ -43,11 +44,14 @@ namespace giSelleRemastered.Controllers
             StateInitialisation();
             
             ViewBag.Comments = GetCommentsForProduct(product);
-            ViewBag.CurrentUser = User.Identity.GetUserId();
+            ViewBag.CurrentUser = userId;
 
-            ViewBag.IsAdmin = User.IsInRole("Admin");
-            ViewBag.ShowButtons = User.IsInRole("Admin") || (User.IsInRole("Partner") && IsOwner(product.UserId));
-            ViewBag.ShowAddComment = User.IsInRole("Admin") || User.IsInRole("Partner") || User.IsInRole("User");
+            Rating userRating = db.Ratings.Where(i => i.UserId == userId)
+                                          .Where(i => i.ProductId == product.Id).FirstOrDefault();
+            if (userRating != null)
+            {
+                ViewBag.RateValue = userRating.Value;
+            }
 
             return View(product);
         }
@@ -57,18 +61,15 @@ namespace giSelleRemastered.Controllers
         public ActionResult Show(Comment comment)
         {
             // TODO: This is a little bit misleading, it posts a comment when viewing a product
+            string userId = User.Identity.GetUserId();
             var product = db.Products.Include(i => i.Image)
                                      .Include(i => i.User)
                                      .Include(i => i.Comments)
                                      .Where(p => p.Id == comment.ProductId).FirstOrDefault();
             StateInitialisation();
             ViewBag.Comments = GetCommentsForProduct(product);
-            ViewBag.CurrentUser = User.Identity.GetUserId();
-
-            ViewBag.IsAdmin = User.IsInRole("Admin");
-            ViewBag.ShowButtons = User.IsInRole("Admin") || (User.IsInRole("Partner") && IsOwner(product.UserId));
-            ViewBag.ShowAddComment = User.IsInRole("Admin") || User.IsInRole("Partner") || User.IsInRole("User");
-
+            ViewBag.CurrentUser = userId; 
+          
             comment.Date = DateTime.Now;
             comment.UserId = User.Identity.GetUserId();
             

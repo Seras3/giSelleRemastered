@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Web;
+﻿using System.ComponentModel.DataAnnotations;
+
 
 namespace giSelleRemastered.Models
 {
@@ -15,7 +12,7 @@ namespace giSelleRemastered.Models
         public int ProductId { get; set; }
         
         [Required]
-        public int UserId { get; set; }
+        public string UserId { get; set; }
 
         [Range(1, 5)]
         public int Value { get; set; }
