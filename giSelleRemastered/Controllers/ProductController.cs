@@ -41,6 +41,12 @@ namespace giSelleRemastered.Controllers
             if (!product.Accepted)
                 return RedirectToAction("Index");
             
+            if (Session["Message"] != null)
+            {
+                ViewBag.Message = Session["Message"];
+                Session["Message"] = null;
+            }
+            
             StateInitialisation();
             
             ViewBag.Comments = GetCommentsForProduct(product);
@@ -56,39 +62,6 @@ namespace giSelleRemastered.Controllers
             return View(product);
         }
 
-        [HttpPost]
-        [Authorize(Roles = "Admin,Partner,User")]
-        public ActionResult Show(Comment comment)
-        {
-            // TODO: This is a little bit misleading, it posts a comment when viewing a product
-            string userId = User.Identity.GetUserId();
-            var product = db.Products.Include(i => i.Image)
-                                     .Include(i => i.User)
-                                     .Include(i => i.Comments)
-                                     .Where(p => p.Id == comment.ProductId).FirstOrDefault();
-            StateInitialisation();
-            ViewBag.Comments = GetCommentsForProduct(product);
-            ViewBag.CurrentUser = userId; 
-          
-            comment.Date = DateTime.Now;
-            comment.UserId = User.Identity.GetUserId();
-            
-            if (comment.Content == null)
-                return View(product);
-            
-            try
-            {
-                if (ModelState.IsValid)
-                {
-                    db.Comments.Add(comment);
-                    db.SaveChanges();
-                }
-                return Redirect("/Product/Show/" + comment.ProductId);
-            }
-            catch(Exception) {}
-            return View(product);
-
-        }
 
         [Authorize(Roles = "Admin,Partner")]
         public ActionResult New()

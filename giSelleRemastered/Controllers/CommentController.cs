@@ -11,7 +11,38 @@ namespace giSelleRemastered.Controllers
     public class CommentController : Controller
     {
 
-        ApplicationDbContext db = new ApplicationDbContext();
+        private ApplicationDbContext db = new ApplicationDbContext();
+
+        [HttpPost]
+        [Authorize(Roles = "Admin,Partner,User")]
+        public ActionResult New(int id, Comment comment)
+        {   
+            if (db.Products.Find(comment.ProductId) == null)
+            {
+                return RedirectToAction("Show", "Product", new { id });
+            }
+
+            comment.Date = DateTime.Now;
+            comment.UserId = User.Identity.GetUserId();
+
+            if (comment.Content == null )
+            {
+                Session["Message"] = "Comment should not be empty";
+                return RedirectToAction("Show", "Product", new { id });
+            }
+
+            if (ModelState.IsValid)
+            {
+                db.Comments.Add(comment);
+                db.SaveChanges();
+            }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine("Invalid comment");
+            }
+
+            return RedirectToAction("Show", "Product", new { id });
+        }
 
         [Authorize(Roles = "Admin,Partner,User")]
         public ActionResult Edit(int id)
