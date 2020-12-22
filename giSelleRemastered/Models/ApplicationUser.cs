@@ -14,8 +14,8 @@ namespace giSelleRemastered.Models
             return userIdentity;
         }
 
-        //public int CartId { get; set; }
-        //public virtual Cart Cart { get; set; }
+        public int CartId { get; set; }
+        public virtual Cart Cart { get; set; }
         public virtual ICollection<Comment> Comments { get; set; }
         public virtual ICollection<Rating> Ratings { get; set; }
         public virtual ICollection<Invoice> Invoices { get; set; }

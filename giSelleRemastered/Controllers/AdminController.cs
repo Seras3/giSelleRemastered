@@ -42,7 +42,9 @@ namespace giSelleRemastered.Controllers
         [HttpPut]
         public ActionResult UserEdit(string id, string RoleName)
         {
+
             db.UsersRoles.Remove(db.UsersRoles.Where(i => i.UserId == id).FirstOrDefault());
+            db.SaveChanges();
             UserManager.AddToRole(id, RoleName);
             db.SaveChanges();
             return RedirectToAction("UserIndex");

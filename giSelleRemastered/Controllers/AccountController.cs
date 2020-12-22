@@ -14,6 +14,7 @@ namespace giSelleRemastered.Controllers
     {
         private ApplicationSignInManager _signInManager;
         private ApplicationUserManager _userManager;
+        private ApplicationDbContext db = new ApplicationDbContext();
 
         public AccountController()
         {
@@ -142,6 +143,10 @@ namespace giSelleRemastered.Controllers
             if (ModelState.IsValid)
             {
                 var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
+                Cart cart = new Cart();
+                db.Carts.Add(cart);
+                db.SaveChanges();
+                user.CartId = cart.Id;
                 var result = await UserManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {

@@ -32,7 +32,9 @@ namespace giSelleRemastered
                         var defaultAdminEmail = "admin@admin.com";
                         var defaultAdminPassword = "Admin1!";
 
-                        var user = new ApplicationUser { UserName = defaultAdminEmail, Email = defaultAdminEmail };
+                        var cart = new Cart();
+                        context.Carts.Add(cart);
+                        var user = new ApplicationUser { UserName = defaultAdminEmail, Email = defaultAdminEmail, CartId = cart.Id };
                         var adminCreated = userManager.Create(user, defaultAdminPassword);
                         if (adminCreated.Succeeded)
                         {

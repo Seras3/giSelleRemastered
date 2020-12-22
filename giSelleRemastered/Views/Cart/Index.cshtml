@@ -1,0 +1,43 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+}
+
+@model giSelleRemastered.Models.Cart
+
+<h2>My cart</h2>
+
+@if (ViewBag.Message != null)
+{
+    <p class="text-success">@ViewBag.Message</p>
+}
+
+@if (ViewBag.ErrorMessage != null)
+{
+    <p class="text-danger">@ViewBag.ErrorMessage</p>
+}
+
+<div class="card">
+    <div class="card-body">
+        @foreach (var product in Model.Products)
+        {
+            <div class="card">
+                <div class="card-body">
+                    <h4>@product.Name </h4>
+                    <form method="post" action="/Cart/Delete/@product.Id">
+                        @Html.HttpMethodOverride(HttpVerbs.Delete)
+                        <button type="submit" class="btn btn-sm btn-danger float-right">X</button>
+                    </form>
+                    <p>Price : <strong style="color: green">@product.PriceInMu @product.Currency</strong></p>
+                </div>
+            </div>
+            <br />
+        }
+    </div>
+    <div class="card-footer d-flex justify-content-between">
+        <div></div>
+        <a class="btn btn-lg btn-primary" href="/Cart/PlaceOrder/@Model.Id">Place order</a>
+        <div></div>
+    </div>
+</div>
+

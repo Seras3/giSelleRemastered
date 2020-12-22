@@ -5,42 +5,56 @@
 
 @model giSelleRemastered.Models.Product
 
+@if (ViewBag.CartMessage != null)
+{
+    <p class="text-success">@ViewBag.CartMessage</p>
+}
+
+@if (ViewBag.CartErrorMessage != null)
+{
+    <p class="text-danger">@ViewBag.CartErrorMessage</p>
+}
+
 <div class="card">
     @Html.Partial("_ProductBody", Model)
 
     @if (User.IsInRole("User") || User.IsInRole("Partner") || User.IsInRole("Admin"))
     {
-    <div class="card-footer d-flex justify-content-between align-items-center">
-        <div>
-            @if ((User.IsInRole("Partner") && Model.UserId == ViewBag.CurrentUser) || User.IsInRole("Admin"))
-            {
-                <a class="btn btn-primary" href="/Product/Edit/@Model.Id">Edit</a>
-            }
-        </div>
-        <form class="rate" method="post" action="/Rating/New/@Model.Id" id="rate">
-            @for (var i = 5; i >= 1; i--)
-            {
-                if (ViewBag.RateValue == i)
+        <div class="card-footer d-flex justify-content-between align-items-center">
+            <div>
+                @if ((User.IsInRole("Partner") && Model.UserId == ViewBag.CurrentUser) || User.IsInRole("Admin"))
                 {
-                    <input type="radio" id="star_@i" name="Value" value="@i" checked />
+                    <a class="btn btn-primary" href="/Product/Edit/@Model.Id">Edit</a>
+                }
+            </div>
+            <form class="rate" method="post" action="/Rating/New/@Model.Id" id="rate">
+                @for (var i = 5; i >= 1; i--)
+                {
+                    if (ViewBag.RateValue == i)
+                    {
+                        <input type="radio" id="star_@i" name="Value" value="@i" checked />
+                    }
+                    else
+                    {
+                        <input type="radio" id="star_@i" name="Value" value="@i" />
+                    }
+                    <label for="star_@i">@i stars</label>
+                }
+            </form>
+            <div>
+                @if ((User.IsInRole("Partner") && Model.UserId == ViewBag.CurrentUser) || User.IsInRole("Admin"))
+                {
+                    <form method="post" action="/Product/Delete/@Model.Id">
+                        @Html.HttpMethodOverride(HttpVerbs.Delete)
+                        <button type="submit" class="btn btn-danger">Delete</button>
+                    </form>
                 }
                 else
                 {
-                    <input type="radio" id="star_@i" name="Value" value="@i" />
+                    <a href="/Cart/Add/@Model.Id" class="btn btn-success">Add to cart</a>
                 }
-                <label for="star_@i">@i stars</label>
-            }
-        </form>
-        <div>
-            @if ((User.IsInRole("Partner") && Model.UserId == ViewBag.CurrentUser) || User.IsInRole("Admin"))
-            {
-                <form method="post" action="/Product/Delete/@Model.Id">
-                    @Html.HttpMethodOverride(HttpVerbs.Delete)
-                    <button type="submit" class="btn btn-danger">Delete</button>
-                </form>
-            }
+            </div>
         </div>
-    </div>
     }
 </div>
 
@@ -108,17 +122,17 @@
 
 @if (User.IsInRole("Admin") || User.IsInRole("Partner") || User.IsInRole("User"))
 {
-@section Scripts {
-    <script type="text/javascript">
-        window.addEventListener("DOMContentLoaded", function () {
-            var form = document.getElementById('rate');
+    @section Scripts {
+        <script type="text/javascript">
+            window.addEventListener("DOMContentLoaded", function () {
+                var form = document.getElementById('rate');
 
-            for (let i = 1; i <= 5; i++) {
-                document.getElementById("star_" + i).addEventListener("click", function () {
-                    form.submit();
-                });
-            }
-        });
-    </script>
-}
+                for (let i = 1; i <= 5; i++) {
+                    document.getElementById("star_" + i).addEventListener("click", function () {
+                        form.submit();
+                    });
+                }
+            });
+        </script>
+    }
 }

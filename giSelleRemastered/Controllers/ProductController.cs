@@ -40,13 +40,16 @@ namespace giSelleRemastered.Controllers
                                     .Where(p => p.Id == id).FirstOrDefault();
             if (!product.Accepted)
                 return RedirectToAction("Index");
-            
-            if (Session["Message"] != null)
-            {
-                ViewBag.Message = Session["Message"];
-                Session["Message"] = null;
-            }
-            
+
+            ViewBag.Message = Session["Message"];
+            Session["Message"] = null;
+
+            ViewBag.CartMessage = Session["CartMessage"];
+            Session["CartMessage"] = null;
+
+            ViewBag.CartErrorMessage = Session["CartErrorMessage"];
+            Session["CartErrorMessage"] = null;
+
             StateInitialisation();
             
             ViewBag.Comments = GetCommentsForProduct(product);
