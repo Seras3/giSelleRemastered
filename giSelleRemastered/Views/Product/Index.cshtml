@@ -8,6 +8,20 @@
 
 <h2>Products list</h2>
 
+<form id="filter" method="GET" action="/Product/Index" class="d-flex justify-content-between">
+    <div class="d-flex justify-content-between">
+        <input name="search" type="text" class="form-control" value="@ViewBag.Search" />
+        <button type="submit" class="btn btn-primary d-inline ml-2">Search</button>
+    </div>
+    <div>
+        <input id="priceOrder" type="hidden" name="priceOrder" value="@ViewBag.PriceOrdVal" />
+        <button id="btnPriceOrder" class="btn btn-primary">Price</button>
+        <input id="rateOrder" type="hidden" name="rateOrder" value="@ViewBag.RateOrdVal" />
+        <button id="btnRateOrder" class="btn btn-primary">Rating</button>
+    </div>
+    <div></div>
+</form>
+
 <p class="text-info">@ViewBag.Message</p>
 
 <br />
@@ -18,16 +32,16 @@
         {
             <h3>@product.Name</h3>
             <Strong>Categories :</Strong>
-                foreach (var category in product.Categories)
-                {
+            foreach (var category in product.Categories)
+            {
                 <a href="/Category/Show/@category.Id">@category.Name |</a>
-                }
-            <br /> 
+            }
+            <br />
             <strong>Price : <span class="text-success">@product.PriceInMu @product.Currency</span></strong>
             <br />
             if (product.HasQuantity)
             {
-            <strong class="text-info">In stock : @product.Quantity </strong>
+                <strong class="text-info">In stock : @product.Quantity </strong>
             }
             <br />
             <br />
@@ -38,7 +52,66 @@
 </div>
 
 <br />
-@if (ViewBag.ShowButtons)
+@if (User.IsInRole("Admin") || User.IsInRole("Partner"))
 {
     <a class="btn btn-success" href="/Product/New">Add product</a>
+}
+
+
+@section Scripts {
+<script type="text/javascript">
+    window.addEventListener("DOMContentLoaded", function () {
+        var form = document.getElementById('filter');
+
+        var priceInput = document.getElementById("priceOrder");
+        var priceButton = document.getElementById("btnPriceOrder");
+        var rateInput = document.getElementById("rateOrder");
+        var rateButton = document.getElementById("btnRateOrder");
+
+
+        if (priceInput.value == "0") {
+            priceButton.classList.add("filter-desc");
+        }
+        else if (priceInput.value == "1") {
+            priceButton.classList.add("filter-asc");
+        }
+
+        if (rateInput.value == "0") {
+            rateButton.classList.add("filter-desc");
+        }
+        else if (rateInput.value == "1") {
+            rateButton.classList.add("filter-asc");
+        }
+
+        
+        priceButton.addEventListener("click", function () {
+            if (priceInput.value == "") {
+                priceInput.value = "0";
+            }
+            else if (priceInput.value == "0") {
+                priceInput.value = "1";
+            }
+            else if (priceInput.value == "1") {
+                priceInput.value = "";
+            }
+
+            form.submit();
+        });
+
+        rateButton.addEventListener("click", function () {
+            if (rateInput.value == "") {
+                rateInput.value = "0";
+            }
+            else if (rateInput.value == "0") {
+                rateInput.value = "1";
+            }
+            else if (rateInput.value == "1") {
+                rateInput.value = "";
+            }
+
+            form.submit();
+        });
+
+        });
+</script>
 }

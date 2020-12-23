@@ -18,16 +18,13 @@ namespace giSelleRemastered.Controllers
         private ApplicationDbContext db = new ApplicationDbContext();
         private IMapper mapper = MapperContext.mapper;
 
-        public ActionResult Index()
+        public ActionResult Index(string search, string priceOrder, string rateOrder)
         {
             if (TempData.ContainsKey("Message"))
             {
                 ViewBag.Message = TempData["Message"].ToString();
             }
-            var products = (from product in db.Products.Include("Categories")
-                             orderby product.Name
-                             select product).ToList();
-            ViewBag.ShowButtons = User.IsInRole("Admin") || User.IsInRole("Partner");
+            var products = GetFilterProducts(search, priceOrder, rateOrder);
             return View(products);
         }
 
@@ -304,6 +301,64 @@ namespace giSelleRemastered.Controllers
         public bool IsOwner(string id)
         {
             return id == User.Identity.GetUserId();
+        }
+
+        public float GetAvgRating(IEnumerable<Rating> ratings)
+        {
+            float total = 0;
+            int count = 0;
+            foreach (var rating in ratings)
+            {
+                total += rating.Value;
+                count += 1;
+            }
+            return total / count;
+        }
+
+        public List<Product> GetFilterProducts(string search, string priceOrder, string rateOrder)
+        {
+            List<Product> products;
+            if (search == null)
+            {
+                products = db.Products.Include("Categories").ToList();
+            }
+            else
+            {
+                products = (from prod in db.Products.Include("Categories")
+                            where prod.Name.Contains(search) || prod.Description.Contains(search)
+                            select prod).ToList();
+            }
+
+            Session["Search"] = search;
+
+            if (priceOrder == "0") // desc
+            {
+                products = products.OrderByDescending(i => i.PriceInMu).ToList();
+            }
+            else if (priceOrder == "1") // asc
+            {
+                products = products.OrderBy(i => i.PriceInMu).ToList();
+            }
+
+            Session["PriceOrdVal"] = priceOrder;
+
+            if (rateOrder == "0") // desc
+            {
+                products = products.OrderByDescending(i => GetAvgRating(i.Ratings)).ToList();
+            }
+            else if (rateOrder == "1") // asc
+            {
+                products = products.OrderBy(i => GetAvgRating(i.Ratings)).ToList();
+            }
+
+            Session["RateOrdVal"] = rateOrder;
+
+            ViewBag.Search = Session["Search"] == null ? "" : Session["Search"].ToString();
+            ViewBag.PriceOrdVal = Session["PriceOrdVal"] == null ? "" : Session["PriceOrdVal"].ToString();
+            ViewBag.RateOrdVal = Session["RateOrdVal"] == null ? "" : Session["RateOrdVal"].ToString();
+
+
+            return products;
         }
     }
 }
