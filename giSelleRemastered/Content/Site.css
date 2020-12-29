@@ -47,3 +47,21 @@
 .filter-desc::after {
     content: " ▼";
 }
+
+.card-img-top {
+    width: 100%;
+    height: 20vw;
+    object-fit: cover;
+}
+
+.product-description {
+    height: 2rem;
+}
+
+.product-description * {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+

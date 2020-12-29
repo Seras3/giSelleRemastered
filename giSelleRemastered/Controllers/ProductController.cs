@@ -320,11 +320,11 @@ namespace giSelleRemastered.Controllers
             List<Product> products;
             if (search == null)
             {
-                products = db.Products.Include("Categories").ToList();
+                products = db.Products.Include("Categories").Include("Image").ToList();
             }
             else
             {
-                products = (from prod in db.Products.Include("Categories")
+                products = (from prod in db.Products.Include("Categories").Include("Image")
                             where prod.Name.Contains(search) || prod.Description.Contains(search)
                             select prod).ToList();
             }

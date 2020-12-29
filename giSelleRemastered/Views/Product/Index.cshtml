@@ -2,6 +2,7 @@
 
 @{
     ViewBag.Title = "Products list";
+    int productOrder = 0;
 }
 
 @model List<Product>
@@ -9,9 +10,11 @@
 <h2>Products list</h2>
 
 <form id="filter" method="GET" action="/Product/Index" class="d-flex justify-content-between">
-    <div class="d-flex justify-content-between">
-        <input name="search" type="text" class="form-control" value="@ViewBag.Search" />
-        <button type="submit" class="btn btn-primary d-inline ml-2">Search</button>
+    <div>
+        @if (User.IsInRole("Admin") || User.IsInRole("Partner"))
+        {
+            <a class="btn btn-success" href="/Product/New">Add product</a>
+        }
     </div>
     <div>
         <input id="priceOrder" type="hidden" name="priceOrder" value="@ViewBag.PriceOrdVal" />
@@ -19,43 +22,52 @@
         <input id="rateOrder" type="hidden" name="rateOrder" value="@ViewBag.RateOrdVal" />
         <button id="btnRateOrder" class="btn btn-primary">Rating</button>
     </div>
-    <div></div>
+    <div class="d-flex">
+        <input name="search" type="text" class="form-control" value="@ViewBag.Search" />
+        <button type="submit" class="btn btn-primary d-inline ml-2">Search</button>
+    </div>
 </form>
 
 <p class="text-info">@ViewBag.Message</p>
 
 <br />
-<div>
-    @foreach (Product product in Model)
-    {
-        if (product.Accepted)
+<div class="container">
+    <div class="row">
+        @foreach (Product product in Model)
         {
-            <h3>@product.Name</h3>
-            <Strong>Categories :</Strong>
-            foreach (var category in product.Categories)
+            if (product.Accepted)
             {
-                <a href="/Category/Show/@category.Id">@category.Name |</a>
+                <div class="col-12 col-md-6 col-lg-3 mb-5">
+                    <div class="card" style="width: auto; ">
+                        <img src="@Url.Content("~/Content/Images/Products/" + product.Image.Name + product.Image.Extension)" class="card-img-top" alt="model image">
+                        <div class="card-body">
+                            <h5 class="card-title">@product.Name</h5>
+                            <div class="product-description">
+                                <p class="card-text">@product.Description</p>
+                            </div>
+                            <p class="card-text">
+                                @foreach (var category in product.Categories)
+                                {
+                                    <a href="/Category/Show/@category.Id">@category.Name |</a>
+                                }
+                                <br />
+                                <strong>Price : <span class="text-success">@product.PriceInMu @product.Currency</span></strong>
+                                <br />
+                                @if (product.HasQuantity)
+                                {
+                                    <strong class="text-info">In stock : @product.Quantity </strong>
+                                }
+                                <br />
+                                <a class="btn btn-info" href="/Product/Show/@product.Id">Show</a>
+                            </p>
+                        </div>
+                    </div>
+                </div>
             }
-            <br />
-            <strong>Price : <span class="text-success">@product.PriceInMu @product.Currency</span></strong>
-            <br />
-            if (product.HasQuantity)
-            {
-                <strong class="text-info">In stock : @product.Quantity </strong>
-            }
-            <br />
-            <br />
-            <a class="btn btn-info" href="/Product/Show/@product.Id">Show</a>
-            <hr />
         }
-    }
+    </div>
 </div>
 
-<br />
-@if (User.IsInRole("Admin") || User.IsInRole("Partner"))
-{
-    <a class="btn btn-success" href="/Product/New">Add product</a>
-}
 
 
 @section Scripts {
