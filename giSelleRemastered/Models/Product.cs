@@ -80,6 +80,7 @@ namespace giSelleRemastered.Models
         public float PriceInMu { get; set; }
         public string Currency { get; set; }
         public bool Accepted { get; set; }
+        public float Rating { get; set; }
 
         public ApplicationUser User { get; set; }
         public UploadFile Image { get; set; }

@@ -9,6 +9,8 @@
         <a href="/Category/Show/@category.Id">@category.Name |</a>
     }
     <br />
+    <strong>Rating : <span style="color: #e5dc1c;">@Model.Rating / 5</span></strong>
+    <br />
     <strong>Price : <span class="text-success">@Model.PriceInMu @Model.Currency</span></strong>
     <br />
     @if (Model.HasQuantity)

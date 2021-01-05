@@ -25,7 +25,12 @@ namespace giSelleRemastered.Controllers
                 ViewBag.Message = TempData["Message"].ToString();
             }
             var products = GetFilterProducts(search, priceOrder, rateOrder);
-            return View(products);
+            List<ProductView> viewProducts = new List<ProductView>();
+            foreach(var product in products)
+            {
+                viewProducts.Add(ToProductView(product));
+            }
+            return View(viewProducts);
         }
 
         public ActionResult Show(int id)
@@ -59,7 +64,7 @@ namespace giSelleRemastered.Controllers
                 ViewBag.RateValue = userRating.Value;
             }
 
-            return View(product);
+            return View(ToProductView(product));
         }
 
 
@@ -304,7 +309,7 @@ namespace giSelleRemastered.Controllers
         }
 
         public float GetAvgRating(IEnumerable<Rating> ratings)
-        {
+        { 
             float total = 0;
             int count = 0;
             foreach (var rating in ratings)
@@ -312,7 +317,22 @@ namespace giSelleRemastered.Controllers
                 total += rating.Value;
                 count += 1;
             }
+            if (count == 0)
+                return 0;
+
             return total / count;
+        }
+
+        public float Float2Decimals(float number)
+        {
+            return (float)Math.Round(number * 100)/100;
+        }
+
+        public ProductView ToProductView(Product product)
+        {
+            ProductView viewProduct = mapper.Map<Product, ProductView>(product);
+            viewProduct.Rating = Float2Decimals(GetAvgRating(product.Ratings));
+            return viewProduct;
         }
 
         public List<Product> GetFilterProducts(string search, string priceOrder, string rateOrder)

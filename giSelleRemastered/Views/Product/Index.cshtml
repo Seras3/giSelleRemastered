@@ -2,20 +2,19 @@
 
 @{
     ViewBag.Title = "Products list";
-    int productOrder = 0;
 }
 
-@model List<Product>
+@model IList<ProductView>
 
 <h2>Products list</h2>
 
 <form id="filter" method="GET" action="/Product/Index" class="d-flex justify-content-between">
-    <div>
-        @if (User.IsInRole("Admin") || User.IsInRole("Partner"))
-        {
+    @if (User.IsInRole("Admin") || User.IsInRole("Partner"))
+    {
+        <div>
             <a class="btn btn-success" href="/Product/New">Add product</a>
-        }
-    </div>
+        </div>
+    }
     <div>
         <input id="priceOrder" type="hidden" name="priceOrder" value="@ViewBag.PriceOrdVal" />
         <button id="btnPriceOrder" class="btn btn-primary">Price</button>
@@ -33,7 +32,7 @@
 <br />
 <div class="container">
     <div class="row">
-        @foreach (Product product in Model)
+        @foreach (ProductView product in Model)
         {
             if (product.Accepted)
             {
@@ -46,17 +45,20 @@
                                 <p class="card-text">@product.Description</p>
                             </div>
                             <p class="card-text">
-                                @foreach (var category in product.Categories)
-                                {
-                                    <a href="/Category/Show/@category.Id">@category.Name |</a>
-                                }
+                                <strong>Rating :<span style="color: #e5dc1c;"> @product.Rating / 5</span></strong>
                                 <br />
                                 <strong>Price : <span class="text-success">@product.PriceInMu @product.Currency</span></strong>
                                 <br />
                                 @if (product.HasQuantity)
                                 {
-                                    <strong class="text-info">In stock : @product.Quantity </strong>
+                                    <strong>In stock : <span class="text-info"> @product.Quantity</span></strong>
                                 }
+                                <br />
+                                @foreach (var category in product.Categories)
+                                {
+                                    <a href="/Category/Show/@category.Id">@category.Name |</a>
+                                }
+                                <br />
                                 <br />
                                 <a class="btn btn-info" href="/Product/Show/@product.Id">Show</a>
                             </p>

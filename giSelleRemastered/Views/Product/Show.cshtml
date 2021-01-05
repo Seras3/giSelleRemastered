@@ -3,7 +3,7 @@
     ViewBag.Title = "Show";
 }
 
-@model giSelleRemastered.Models.Product
+@model giSelleRemastered.Models.ProductView
 
 @if (ViewBag.CartMessage != null)
 {
@@ -22,7 +22,7 @@
     {
         <div class="card-footer d-flex justify-content-between align-items-center">
             <div>
-                @if ((User.IsInRole("Partner") && Model.UserId == ViewBag.CurrentUser) || User.IsInRole("Admin"))
+                @if ((User.IsInRole("Partner") && Model.User.Id == ViewBag.CurrentUser) || User.IsInRole("Admin"))
                 {
                     <a class="btn btn-primary" href="/Product/Edit/@Model.Id">Edit</a>
                 }
@@ -42,7 +42,7 @@
                 }
             </form>
             <div>
-                @if ((User.IsInRole("Partner") && Model.UserId == ViewBag.CurrentUser) || User.IsInRole("Admin"))
+                @if ((User.IsInRole("Partner") && Model.User.Id == ViewBag.CurrentUser) || User.IsInRole("Admin"))
                 {
                     <form method="post" action="/Product/Delete/@Model.Id">
                         @Html.HttpMethodOverride(HttpVerbs.Delete)
