@@ -75,7 +75,7 @@
                             <span class="text-danger">@ViewBag.Message</span>
                         }
                         <br />
-                        <button class="btn btn-success" type="submit">Post comment</button>
+                        <button class="btn btn-success" type="submit">Post comment <i class="fa fa-chevron-right"></i></button>
                     </div>
                 </form>
             </div>
@@ -102,7 +102,7 @@
                 @if (ViewBag.CurrentUser == comm.UserId)
                 {
                     <div style="display: inline-block; float : left; margin-right: 15px;">
-                        <a class="btn btn-sm btn-primary" href="/Comment/Edit/@comm.Id">Edit</a>
+                        <a class="btn btn-sm btn-primary" href="/Comment/Edit/@comm.Id"><i class="fas fa-pencil-alt"></i></a>
                     </div>
                 }
                 @if (ViewBag.CurrentUser == comm.UserId || User.IsInRole("Admin"))
@@ -110,7 +110,7 @@
                     <div style="display: inline-block; float : left;">
                         <form method="post" action="/Comment/Delete/@comm.Id">
                             @Html.HttpMethodOverride(HttpVerbs.Delete)
-                            <button class="btn btn-sm btn-danger" type="submit">Delete</button>
+                            <button class="btn btn-sm btn-danger" type="submit"><i class="fas fa-trash-alt"></i></button>
                         </form>
                     </div>
                 }
