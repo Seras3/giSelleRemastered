@@ -5,10 +5,10 @@ An marketplace for tattoo artists.
 
 [**Overviews**](https://github.com/Seras3/giSelleRemastered#overview-from-user-account)
   - [User](https://github.com/Seras3/giSelleRemastered#overview-from-user-account)
-  - [Provider]()
-  - [Admin]()
+  - [Provider](https://github.com/Seras3/giSelleRemastered#overview-from-provider-account)
+  - [Admin](https://github.com/Seras3/giSelleRemastered#overview-from-admin-account)
 
-[**Features**]()
+[**Features**](https://github.com/Seras3/giSelleRemastered#features)
 
 
 
@@ -28,8 +28,35 @@ An marketplace for tattoo artists.
 ### Product search
 ![provider_main](https://github.com/Seras3/giSelleRemastered/blob/master/images/provider-main.JPG)
 
+### Edit post
+   scroll-up            |   scroll-down
+:-------------------------:|:-------------------------:
+![edit_product_1](https://github.com/Seras3/giSelleRemastered/blob/master/images/provider-edit-1.JPG)  |  ![edit_product_2](https://github.com/Seras3/giSelleRemastered/blob/master/images/provider-edit-2.JPG)
+
 
 ## Overview (from admin account)
+
+### Admin links
+
+![admin_links](https://github.com/Seras3/giSelleRemastered/blob/master/images/admin-links.JPG)
+
+### Request list
+
+![request_list](https://github.com/Seras3/giSelleRemastered/blob/master/images/admin-request-list.JPG)
+
+### Request view
+
+![request_view](https://github.com/Seras3/giSelleRemastered/blob/master/images/admin-request-product.JPG)
+
+### Change user role
+
+![admin_user](https://github.com/Seras3/giSelleRemastered/blob/master/images/admin-user.JPG)
+
+### Product view
+
+![admin_product_view](https://github.com/Seras3/giSelleRemastered/blob/master/images/admin-product.JPG)
+
+
 
 ## Features
 There are 4 main entities involved in this hierarchy. (Guest, User, Provider, Admin)
@@ -56,4 +83,5 @@ There are 4 main entities involved in this hierarchy. (Guest, User, Provider, Ad
   - delete any comment
   - change user role
   - approve add product post request
+  - add/update/delete product categories
 
