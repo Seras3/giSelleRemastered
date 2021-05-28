@@ -67,8 +67,7 @@ There are 4 main entities involved in this hierarchy. (Guest, User, Provider, Ad
   - create an account
  
 **User :** (inherit from Guest)
-  - search for products (filters included)
-  - view/buy product
+  - buy product
   - add/update/delete comment on post
   - add/clear rating for a product
   - add/delete product in/from shopping cart
